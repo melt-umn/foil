@@ -1,9 +1,14 @@
 grammar edu:umn:cs:melt:foil:host:abstractsyntax:core;
 
 synthesized attribute isEqualTo::(Boolean ::= Type);
+synthesized attribute isNumeric::Boolean;
 
-tracked data nonterminal Type with pp, isEqualTo;
-
+tracked data nonterminal Type with pp, isEqualTo, isNumeric;
+aspect default production
+top::Type ::=
+{
+  top.isNumeric = false;
+}
 production intType
 top::Type ::=
 {
@@ -77,6 +82,7 @@ top::Type ::=
 {
   top.pp = pp"err";
   top.isEqualTo = \ _ -> true;
+  top.isNumeric = true;
 }
 
 instance Eq Type {

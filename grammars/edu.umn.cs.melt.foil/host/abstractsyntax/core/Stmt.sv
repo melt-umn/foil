@@ -17,6 +17,12 @@ top::Stmt ::= s1::Stmt s2::Stmt
   s1.env = top.env;
   s2.env = addEnv(s1.defs, s1.env);
 }
+production blockStmt
+top::Stmt ::= s::Stmt
+{
+  top.pp = braces(groupnestlines(2, s.pp));
+  s.env = openScopeEnv(top.env);
+}
 production declStmt
 top::Stmt ::= d::VarDecl
 {
@@ -69,4 +75,12 @@ top::Stmt ::= e::Expr
     | just(t) when t != e.type -> [errFromOrigin(e, s"Return expected ${show(80, t)}, but got ${show(80, e.type)}")]
     | _ -> []
     end;
+}
+
+
+instance Semigroup Stmt {
+  append = seqStmt;
+}
+instance Monoid Stmt {
+  mempty = emptyStmt();
 }
