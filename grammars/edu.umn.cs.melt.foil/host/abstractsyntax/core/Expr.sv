@@ -53,9 +53,123 @@ top::Expr ::= s::String
 }
 
 -- Operators
-production addOp
+production intAddOp
 top::Expr ::= e1::Expr e2::Expr
 {
   top.pp = pp"(${e1}) + (${e2})";
-  
+  top.type = intType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"+ expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"+ expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intSubOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) - (${e2})";
+  top.type = intType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"- expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"- expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intMulOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) * (${e2})";
+  top.type = intType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"* expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"* expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intDivOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) / (${e2})";
+  top.type = intType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"/ expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"/ expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intEqOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) == (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"== expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"== expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intNeqOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) != (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"!= expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"!= expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intGtOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) > (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"> expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"> expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intLtOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) < (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"< expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"< expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intGteOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) >= (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s">= expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s">= expected an int operand, but got ${show(80, e2.type)}")];
+}
+production intLteOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"(${e1}) <= (${e2})";
+  top.type = boolType();
+  top.errors <-
+    if e1.type == intType() then []
+    else [errFromOrigin(e1, s"<= expected an int operand, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == intType() then []
+    else [errFromOrigin(e2, s"<= expected an int operand, but got ${show(80, e2.type)}")];
 }
