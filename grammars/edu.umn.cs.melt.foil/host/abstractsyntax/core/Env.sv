@@ -3,8 +3,8 @@ grammar edu:umn:cs:melt:foil:host:abstractsyntax:core;
 monoid attribute defs::Defs;
 inherited attribute env::Env;
 
-monoid attribute valueContribs::Contribs<Decorated Decl>;
-synthesized attribute values::Scopes<Decorated Decl>;
+monoid attribute valueContribs::Contribs<ValueItem>;
+synthesized attribute values::Scopes<ValueItem>;
 
 closed data nonterminal Defs with valueContribs;
 propagate valueContribs on Defs;
@@ -21,9 +21,9 @@ production emptyDefs
 top::Defs ::=
 {}
 production valueDef
-top::Defs ::= d::Decorated Decl
+top::Defs ::= i::ValueItem
 {
-  top.valueContribs <- [(d.name, d)];
+  top.valueContribs <- [(i.name, i)];
 }
 
 instance Semigroup Defs {
@@ -51,4 +51,42 @@ top::Env ::= e::Env
   top.values = openScope(e.values);
 }
 
-fun lookupValue [Decorated Decl] ::= n::String e::Env = lookupScope(n, e.values);
+synthesized attribute lookupErrors::[Message];
+synthesized attribute isAssignable::Boolean;
+data nonterminal ValueItem with name, type, lookupErrors, isAssignable;
+aspect default production
+top::ValueItem ::=
+{
+  top.lookupErrors = [];
+}
+production varValueItem
+top::ValueItem ::= d::Decorated VarDecl
+{
+  top.name = d.name;
+  top.type = d.type;
+  top.isAssignable = true;
+}
+production fnValueItem
+top::ValueItem ::= d::Decorated FnDecl
+{
+  top.name = d.name;
+  top.type = fnType(d.paramTypes, d.retType);
+  top.isAssignable = false;
+}
+production paramValueItem
+top::ValueItem ::= d::Decorated Param
+{
+  top.name = d.name;
+  top.type = d.type;
+  top.isAssignable = true;
+}
+production errorValueItem
+top::ValueItem ::= name::String
+{
+  top.name = name;
+  top.type = errorType();
+  top.lookupErrors = [errFromOrigin(top, s"Undefined value ${name}")];
+  top.isAssignable = true;
+}
+
+fun lookupValue [ValueItem] ::= n::String e::Env = lookupScope(n, e.values);
