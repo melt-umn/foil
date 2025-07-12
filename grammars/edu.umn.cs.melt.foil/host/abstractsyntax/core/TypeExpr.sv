@@ -71,10 +71,14 @@ top::Fields ::=
   top.fields = [];
 }
 production consField
-top::Fields ::= h::Field fs::Fields
+top::Fields ::= f::Field fs::Fields
 {
-  top.pps = h.pp :: fs.pps;
-  top.fields = (h.name, h.type) :: fs.fields;
+  top.pps = f.pp :: fs.pps;
+  top.fields = (f.name, f.type) :: fs.fields;
+  top.errors <-
+    if lookup(f.name, fs.fields).isJust
+    then [errFromOrigin(f, s"Duplicate field name '${f.name}' in object literal")]
+    else [];
 }
 
 tracked nonterminal Field with pp, env, name, type, errors;

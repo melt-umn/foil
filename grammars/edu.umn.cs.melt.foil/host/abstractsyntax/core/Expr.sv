@@ -29,7 +29,7 @@ top::Expr ::= d::VarDecl b::Expr
   d.env = top.env;
   b.env = addEnv(d.defs, top.env);
 }
-production fnCall
+production call
 top::Expr ::= f::Expr a::Exprs
 {
   top.pp = pp"${f.wrapPP}(${ppImplode(pp", ", a.pps)})";
@@ -79,6 +79,47 @@ top::Exprs ::=
     if null(top.expectedTypes) then []
     else [errFromOrigin(top, "Too few arguments to function")];
 }
+
+production object
+top::Expr ::= fs::FieldExprs
+{
+  top.pp = braces(ppImplode(pp", ", fs.pps));
+  top.wrapPP = top.pp;
+  top.type = objType(sortByKey(fst, fs.fields));
+}
+
+tracked nonterminal FieldExprs with pps, env, fields, errors;
+propagate env, errors on FieldExprs;
+
+production consFieldExpr
+top::FieldExprs ::= f::FieldExpr fs::FieldExprs
+{
+  top.pps = f.pp :: fs.pps;
+  top.fields = (f.name, f.type) :: fs.fields;
+
+  top.errors <-
+    if lookup(f.name, fs.fields).isJust
+    then [errFromOrigin(f, s"Duplicate field name '${f.name}' in object literal")]
+    else [];
+}
+production nilFieldExpr
+top::FieldExprs ::=
+{
+  top.pps = [];
+  top.fields = [];
+}
+
+tracked nonterminal FieldExpr with pp, env, name, type, errors;
+propagate env, errors on FieldExpr;
+
+production fieldExpr
+top::FieldExpr ::= n::Name e::Expr
+{
+  top.pp = pp"${n} : ${e.wrapPP}";
+  top.name = n.name;
+  top.type = e.type;
+}
+
 
 -- Literals
 production intLit
