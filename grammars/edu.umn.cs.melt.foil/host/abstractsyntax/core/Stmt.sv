@@ -10,14 +10,14 @@ top::Stmt ::=
 {
   top.pp = pp"";
 }
-production seqStmt
+production seq
 top::Stmt ::= s1::Stmt s2::Stmt
 {
   top.pp = pp"${s1}\n${s2}";
   s1.env = top.env;
   s2.env = addEnv(s1.defs, s1.env);
 }
-production blockStmt
+production block
 top::Stmt ::= s::Stmt
 {
   top.pp = braces(groupnestlines(2, s.pp));
@@ -29,7 +29,7 @@ top::Stmt ::= d::VarDecl
   top.pp = pp"${d};";
   d.env = top.env;
 }
-production assignStmt
+production assign
 top::Stmt ::= n::Name e::Expr
 {
   top.pp = pp"${n} = ${box(e.pp)};";
@@ -42,7 +42,7 @@ top::Stmt ::= n::Name e::Expr
     if n.lookupValue.type == e.type then []
     else [errFromOrigin(e, s"${n.name} has type ${show(80, n.lookupValue.type)}, but the assigned expression has type ${show(80, e.type)}")];
 }
-production ifStmt
+production if_
 top::Stmt ::= c::Expr t::Stmt e::Stmt
 {
   top.pp = pp"if (${box(c.pp)}) {${groupnestlines(2, t.pp)}}${
@@ -55,7 +55,7 @@ top::Stmt ::= c::Expr t::Stmt e::Stmt
     if c.type == boolType() then []
     else [errFromOrigin(c, s"If condition expected a Boolean")];
 }
-production whileStmt
+production while
 top::Stmt ::= c::Expr b::Stmt
 {
   top.pp = pp"while (${box(c.pp)}) {${groupnestlines(2, b.pp)}}";
@@ -64,7 +64,7 @@ top::Stmt ::= c::Expr b::Stmt
     if c.type == boolType() then []
     else [errFromOrigin(c, s"While condition expected a Boolean")];
 }
-production returnStmt
+production return_
 top::Stmt ::= e::Expr
 {
   top.pp = pp"return ${box(e.pp)};";
@@ -79,7 +79,7 @@ top::Stmt ::= e::Expr
 
 
 instance Semigroup Stmt {
-  append = seqStmt;
+  append = seq;
 }
 instance Monoid Stmt {
   mempty = emptyStmt();
