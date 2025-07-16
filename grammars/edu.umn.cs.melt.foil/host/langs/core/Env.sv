@@ -52,8 +52,7 @@ top::Env ::= e::Env
 }
 
 synthesized attribute lookupErrors::[Message];
-synthesized attribute isAssignable::Boolean;
-data nonterminal ValueItem with name, type, lookupErrors, isAssignable;
+data nonterminal ValueItem with name, type, lookupErrors, isLValue;
 aspect default production
 top::ValueItem ::=
 {
@@ -64,21 +63,21 @@ top::ValueItem ::= d::Decorated VarDecl
 {
   top.name = d.name;
   top.type = d.type;
-  top.isAssignable = true;
+  top.isLValue = true;
 }
 production fnValueItem
 top::ValueItem ::= d::Decorated FnDecl
 {
   top.name = d.name;
   top.type = fnType(d.paramTypes, d.retType);
-  top.isAssignable = false;
+  top.isLValue = false;
 }
 production paramValueItem
 top::ValueItem ::= d::Decorated Param
 {
   top.name = d.name;
   top.type = d.type;
-  top.isAssignable = true;
+  top.isLValue = true;
 }
 production errorValueItem
 top::ValueItem ::= name::String
@@ -86,7 +85,7 @@ top::ValueItem ::= name::String
   top.name = name;
   top.type = errorType();
   top.lookupErrors = [errFromOrigin(top, s"Undefined value ${name}")];
-  top.isAssignable = true;
+  top.isLValue = true;
 }
 
 fun lookupValue [ValueItem] ::= n::String e::Env = lookupScope(n, e.values);

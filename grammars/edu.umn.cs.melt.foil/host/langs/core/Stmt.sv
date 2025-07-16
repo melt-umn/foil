@@ -2,6 +2,8 @@ grammar edu:umn:cs:melt:foil:host:langs:core;
 
 inherited attribute returnType::Maybe<Type>;
 
+synthesized attribute hasReturn::Boolean;
+
 tracked nonterminal Stmt with pp, returnType, env, defs, errors;
 propagate returnType, defs, errors on Stmt;
 
@@ -23,24 +25,29 @@ top::Stmt ::= s::Stmt
   top.pp = braces(groupnestlines(2, s.pp));
   s.env = openScopeEnv(top.env);
 }
-production declStmt
+production decl
 top::Stmt ::= d::VarDecl
 {
   top.pp = pp"${d};";
   d.env = top.env;
 }
-production assign
-top::Stmt ::= n::Name e::Expr
+production expr
+top::Stmt ::= e::Expr
 {
-  top.pp = pp"${n} = ${box(e.pp)};";
+  top.pp = pp"${e.pp};";
   propagate env;
-  top.errors <- n.lookupValue.lookupErrors;
+}
+production assign
+top::Stmt ::= lhs::Expr rhs::Expr
+{
+  top.pp = pp"${lhs} = ${box(rhs.pp)};";
+  propagate env;
   top.errors <-
-    if n.lookupValue.isAssignable then []
-    else [errFromOrigin(n, s"${n.name} cannot be assigned to")];
+    if lhs.isLValue then []
+    else [errFromOrigin(lhs, s"This value cannot be assigned to")];
   top.errors <-
-    if n.lookupValue.type == e.type then []
-    else [errFromOrigin(e, s"${n.name} has type ${show(80, n.lookupValue.type)}, but the assigned expression has type ${show(80, e.type)}")];
+    if lhs.type == rhs.type then []
+    else [errFromOrigin(rhs, s"Assignment expected ${show(80, lhs.type)}, but got ${show(80, rhs.type)}")];
 }
 production if_
 top::Stmt ::= c::Expr t::Stmt e::Stmt

@@ -1,8 +1,9 @@
 grammar edu:umn:cs:melt:foil:host:langs:core;
 
 synthesized attribute wrapPP::Document;
+synthesized attribute isLValue::Boolean;
 
-tracked nonterminal Expr with pp, wrapPP, env, type, errors;
+tracked nonterminal Expr with pp, wrapPP, env, isLValue, type, errors;
 propagate env on Expr excluding let_;
 propagate errors on Expr;
 
@@ -10,6 +11,7 @@ aspect default production
 top::Expr ::=
 {
   top.wrapPP = parens(top.pp);
+  top.isLValue = false;
 }
 
 production var
@@ -17,6 +19,7 @@ top::Expr ::= n::Name
 {
   top.pp = n.pp;
   top.wrapPP = n.pp;
+  top.isLValue = n.lookupValue.isLValue;
   top.type = n.lookupValue.type;
   top.errors <- n.lookupValue.lookupErrors;
 }
@@ -115,11 +118,34 @@ propagate env, errors on FieldExpr;
 production fieldExpr
 top::FieldExpr ::= n::Name e::Expr
 {
-  top.pp = pp"${n} : ${e.wrapPP}";
+  top.pp = pp"${n} = ${e.wrapPP}";
   top.name = n.name;
   top.type = e.type;
 }
 
+production fieldAccess
+top::Expr ::= e::Expr f::Name
+{
+  top.pp = pp"${e.wrapPP}.${f.pp}";
+  top.wrapPP = top.pp;
+  top.isLValue = e.isLValue;
+  top.type =
+    case e.type of
+    | objType(fs) when lookup(f.name, fs) matches just(ty) -> ty
+    | _ -> errorType()
+    end;
+  top.errors <-
+    case e.type of
+    | objType(fs) ->
+      case lookup(f.name, fs) of
+      | just(_) -> []
+      | nothing() ->
+        [errFromOrigin(e, s"Object expression has type ${show(80, e.type)}, lacking field '${f.name}'")]
+      end
+    | errorType() -> []
+    | t -> [errFromOrigin(e, s"Field access expected an object type, but got ${show(80, t)}")]
+    end;
+}
 
 -- Literals
 production intLit
@@ -159,6 +185,18 @@ top::Expr ::= s::String
 }
 
 -- Operators
+production cond
+top::Expr ::= c::Expr t::Expr e::Expr
+{
+  top.pp = pp"${c}? ${t} : ${e}";
+  top.wrapPP = parens(top.pp);
+  top.type =
+    if t.type == e.type then t.type
+    else errorType();
+  top.errors <-
+    if c.type == boolType() then []
+    else [errFromOrigin(c, s"Condition expected a bool, but got ${show(80, c.type)}")];
+}
 production negOp
 top::Expr ::= e::Expr
 {
