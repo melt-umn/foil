@@ -1,4 +1,4 @@
-grammar edu:umn:cs:melt:foil:host:abstractsyntax:core;
+grammar edu:umn:cs:melt:foil:host:langs:core;
 
 synthesized attribute type::Type;
 

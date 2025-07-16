@@ -1,4 +1,8 @@
-grammar edu:umn:cs:melt:foil:host:abstractsyntax:core;
+grammar edu:umn:cs:melt:foil:host:langs:core;
+
+nonterminal Foo;
+synthesized attribute bar::Integer;
+attribute bar occurs on Foo;
 
 tracked nonterminal VarDecl with pp, env, name, type, defs, errors;
 propagate env, errors on VarDecl;
