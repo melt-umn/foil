@@ -28,8 +28,6 @@ closed tracked nonterminal FnDecl with ast<ext:FnDecl>;
 concrete productions top::FnDecl
 | 'fun' n::Name '(' ps::Params ')' '->' t::TypeExpr '{' body::StmtList '}'
   { abstract ext:fnDecl; }
-| 'fun' n::Name '(' ps::Params ')' '->' t::TypeExpr '{' '}'
-  { top.ast = ext:fnDecl(n.ast, ps.ast, t.ast, ext:emptyStmt()); }
 
 tracked nonterminal Params with ast<ext:Params>;
 concrete productions top::Params

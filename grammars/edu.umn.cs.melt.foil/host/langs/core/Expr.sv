@@ -83,10 +83,10 @@ top::Exprs ::=
     else [errFromOrigin(top, "Too few arguments to function")];
 }
 
-production object
+production newObject
 top::Expr ::= fs::FieldExprs
 {
-  top.pp = braces(ppImplode(pp", ", fs.pps));
+  top.pp = pp"new {${ppImplode(pp", ", fs.pps)}}";
   top.wrapPP = top.pp;
   top.type = objType(sortByKey(fst, fs.fields));
 }

@@ -10,8 +10,8 @@ concrete productions top::Expr
   { abstract ext:let_; }
 | f::Expr '(' a::Exprs ')'
   { abstract ext:call; }
-| '{' fs::FieldExprs '}'
-  { abstract ext:object; }
+| 'new' '{' fs::FieldExprs '}'
+  { abstract ext:newObject; }
 | e1::Expr '.' n::Name
   { abstract ext:fieldAccess; }
 

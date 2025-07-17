@@ -22,23 +22,24 @@ terminal Modulus_t     '%'  lexer classes {Operator}, precedence = 12, associati
 
 terminal Comma_t       ','  ;
 terminal LParen_t      '('  precedence = 24;  -- precedence is needed for function application
-terminal RParen_t      ')'  ;
+terminal RParen_t      ')'  precedence = 1, association = left;  -- precedence/association for dangling-else
 terminal LCurly_t      '{'  ;
 terminal RCurly_t      '}'  ;
 terminal Dot_t         '.'  precedence = 25, association = left;
 terminal Semi_t        ';'  ;
-terminal Colon_t       ':'  ;
+terminal Colon_t       ':'  precedence = 3, association = left;
 terminal UnderScore_t  '_'  ;
 terminal Arrow_t       '->' ;
 terminal Equals_t      '='  ;
-terminal Question_t    '?'  precedence = 3;
+terminal Question_t    '?'  precedence = 3, association = left;
 
 terminal Var_t         'var'    lexer classes {Keyword};
 terminal Fun_t         'fun'    lexer classes {Keyword};
 terminal If_t          'if'     lexer classes {Keyword};
-terminal Else_t        'else'   lexer classes {Keyword};
+terminal Else_t        'else'   lexer classes {Keyword}, precedence = 2, association = left;
 terminal While_t       'while'  lexer classes {Keyword};
 terminal Return_t      'return' lexer classes {Keyword};
+terminal New_t         'new'    lexer classes {Keyword};
 terminal True_t        'true'   lexer classes {Keyword};
 terminal False_t       'false'  lexer classes {Keyword};
 terminal Let_t         'let'    lexer classes {Keyword};

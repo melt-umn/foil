@@ -4,8 +4,8 @@ tracked nonterminal StmtList with ast<ext:Stmt>;
 concrete productions top::StmtList
 | h::Stmt t::StmtList
   { abstract ext:seq; }
-| h::Stmt
-  { top.ast = h.ast; }
+|
+  { abstract ext:emptyStmt; }
 
 closed tracked nonterminal Stmt with ast<ext:Stmt>;
 concrete productions top::Stmt
