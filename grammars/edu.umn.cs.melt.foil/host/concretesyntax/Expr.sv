@@ -25,6 +25,8 @@ concrete productions top::Expr
   { abstract ext:falseLit; }
 | s::StringLit_t
   { top.ast = ext:stringLit(unescapeString(substring(1, length(s.lexeme) - 1, s.lexeme))); }
+| '(' ')'
+  { abstract ext:unitLit; }
 
 | c::Expr '?' t::Expr ':' e::Expr
   { abstract ext:cond; }

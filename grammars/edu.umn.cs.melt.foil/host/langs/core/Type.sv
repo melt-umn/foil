@@ -77,6 +77,17 @@ top::Type ::= args::[Type] ret::Type
     | _ -> false
     end;
 }
+production unitType
+top::Type ::=
+{
+  top.pp = pp"unit";
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | unitType() -> true
+    | errorType() -> true
+    | _ -> false
+    end;
+}
 production errorType
 top::Type ::=
 {

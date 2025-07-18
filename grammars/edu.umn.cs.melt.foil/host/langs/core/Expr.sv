@@ -183,6 +183,13 @@ top::Expr ::= s::String
   top.wrapPP = top.pp;
   top.type = stringType();
 }
+production unitLit
+top::Expr ::=
+{
+  top.pp = pp"()";
+  top.wrapPP = top.pp;
+  top.type = unitType();
+}
 
 -- Operators
 production cond

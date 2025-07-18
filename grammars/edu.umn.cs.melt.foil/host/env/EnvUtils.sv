@@ -2,6 +2,8 @@ grammar edu:umn:cs:melt:foil:host:env;
 
 imports silver:util:treemap as tm;
 
+-- TODO: Maybe these utilities belong in silver:langutil:env or something like that?
+
 type Scopes<a> = [tm:Map<String a>];
 type Contribs<a> = [(String, a)];
 

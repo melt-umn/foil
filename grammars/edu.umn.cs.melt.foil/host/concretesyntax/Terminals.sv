@@ -50,6 +50,7 @@ terminal Int_t          'int'    lexer classes {Type};
 terminal Float_t        'float'  lexer classes {Type};
 terminal Bool_t         'bool'   lexer classes {Type};
 terminal String_t       'string' lexer classes {Type};
+terminal Unit_t         'unit'   lexer classes {Type};
 
 terminal Identifier_t    /[a-zA-Z_][a-zA-Z0-9_]*/ submits to Keyword;
 

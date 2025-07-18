@@ -25,13 +25,20 @@ production fnDecl
 top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
 {
   top.pp = pp"fun ${n}(${ppImplode(pp", ", params.pps)}) -> ${ret} {${groupnestlines(2, body.pp)}";
+  top.name = n.name;
   top.paramTypes = params.paramTypes;
   top.retType = ret.type;
   top.defs := valueDef(fnValueItem(top));
 
+  body.returnType = just(ret.type);
+
   params.env = top.env;
   ret.env = top.env;
   body.env = addEnv(params.defs, top.env);
+
+  top.errors <-
+    if ret.type == unitType() || body.hasReturn then []
+    else [errFromOrigin(body, s"Function ${n.name} must return a value of type ${show(80, ret.type)}")];
 }
 
 tracked nonterminal Params with pps, env, paramTypes, defs, errors;

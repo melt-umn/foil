@@ -1,6 +1,7 @@
 grammar edu:umn:cs:melt:foil:host:langs:core;
 
 tracked nonterminal Root with pp, errors;
+propagate errors on Root;
 
 production root
 top::Root ::= d::GlobalDecls

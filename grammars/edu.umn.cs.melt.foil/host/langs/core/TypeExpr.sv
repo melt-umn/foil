@@ -29,6 +29,12 @@ top::TypeExpr ::=
   top.pp = pp"string";
   top.type = stringType();
 }
+production unitTypeExpr
+top::TypeExpr ::=
+{
+  top.pp = pp"unit";
+  top.type = unitType();
+}
 production objTypeExpr
 top::TypeExpr ::= fs::Fields
 {

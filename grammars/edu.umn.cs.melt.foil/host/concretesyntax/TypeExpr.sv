@@ -10,6 +10,8 @@ concrete productions top::TypeExpr
   { abstract ext:boolTypeExpr; }
 | 'string'
   { abstract ext:stringTypeExpr; }
+| 'unit'
+  { abstract ext:unitTypeExpr; }
 | '{' fs::Fields '}'
   { abstract ext:objTypeExpr; }
 | '(' args::TypeExprs ')' '->' ret::TypeExpr
