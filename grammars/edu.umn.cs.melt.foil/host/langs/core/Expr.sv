@@ -266,7 +266,7 @@ production eqOp
 top::Expr ::= e1::Expr e2::Expr
 {
   top.pp = pp"${e1.wrapPP} == ${e2.wrapPP}";
-  top.type = e1.type;
+  top.type = boolType();
   top.errors <-
     if e2.type == e1.type then []
     else [errFromOrigin(e2, s"== expected ${show(80, e1.type)} but got ${show(80, e2.type)}")];

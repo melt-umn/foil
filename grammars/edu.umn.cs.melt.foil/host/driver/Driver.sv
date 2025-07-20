@@ -17,9 +17,9 @@ fun driver IO<Integer> ::= args::[String] parse::(ParseResult<cnc:Root> ::= Stri
 };
 
 fun parseDriver IO<Decorated ext:Root> ::= args::[String] parse::(ParseResult<cnc:Root> ::= String String) = do {
-  when_(length(args) < 1, fail("Usage: foil.jar <file>.foil"));
+  when_(length(args) < 1, fail("Usage: composed_<name>.jar <file>.foil"));
   let fileName = head(args);
-  when_(!endsWith(fileName, ".foil"), fail("File must have .foil extension"));
+  when_(!endsWith(".foil", fileName), fail("File must have .foil extension"));
   text <- readFile(fileName);
   let parseResult = parse(text, fileName);
   when_(!parseResult.parseSuccess, do {

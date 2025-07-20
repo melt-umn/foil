@@ -19,6 +19,7 @@ top::Type ::=
     | errorType() -> true
     | _ -> false
     end;
+  top.isNumeric = true;
 }
 production floatType
 top::Type ::=
@@ -30,6 +31,7 @@ top::Type ::=
     | errorType() -> true
     | _ -> false
     end;
+  top.isNumeric = true;
 }
 production boolType
 top::Type ::=
