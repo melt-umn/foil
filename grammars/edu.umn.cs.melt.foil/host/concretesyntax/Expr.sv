@@ -42,6 +42,8 @@ concrete productions top::Expr
   { abstract ext:mulOp; }
 | e1::Expr '/' e2::Expr
   { abstract ext:divOp; }
+| e1::Expr '%' e2::Expr
+  { abstract ext:modOp; }
 | e1::Expr '==' e2::Expr
   { abstract ext:eqOp; }
 | e1::Expr '!=' e2::Expr
