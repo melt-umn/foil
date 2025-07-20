@@ -4,11 +4,21 @@ imports silver:langutil;
 imports silver:langutil:pp;
 
 imports edu:umn:cs:melt:foil:host:env;
---imports edu:umn:cs:melt:foil:host:langs:core as core;
+imports edu:umn:cs:melt:foil:host:langs:core as core;
 
 include edu:umn:cs:melt:foil:host:langs:core {
   close nonterminals GlobalDecl, Stmt, Expr, TypeExpr, Type;
 }
+
+translation pass toCore to edu:umn:cs:melt:foil:host:langs:core;
+attribute toCore occurs on
+  Root, GlobalDecls, GlobalDecl, VarDecl, FnDecl, Params, Param,
+  TypeExpr, TypeExprs, Fields, Field,
+  Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
+propagate toCore on
+  Root, GlobalDecls, GlobalDecl, VarDecl, FnDecl, Params, Param,
+  TypeExpr, TypeExprs, Fields, Field,
+  Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
 
 production fnDeclUnit
 top::FnDecl ::= n::Name params::Params body::Stmt
