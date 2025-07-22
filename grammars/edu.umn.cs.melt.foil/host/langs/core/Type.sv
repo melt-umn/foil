@@ -2,12 +2,14 @@ grammar edu:umn:cs:melt:foil:host:langs:core;
 
 synthesized attribute isEqualTo::(Boolean ::= Type);
 synthesized attribute isNumeric::Boolean;
+synthesized attribute structFields::Maybe<[(String, Type)]>;
 
-tracked data nonterminal Type with pp, isEqualTo, isNumeric;
+tracked data nonterminal Type with pp, isEqualTo, isNumeric, structFields;
 aspect default production
 top::Type ::=
 {
   top.isNumeric = false;
+  top.structFields = nothing();
 }
 production intType
 top::Type ::=
@@ -55,17 +57,30 @@ top::Type ::=
     | _ -> false
     end;
 }
+production structType
+top::Type ::= d::Decorated StructDecl
+{
+  top.pp = pp"struct ${text(d.name)}";
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | structType(d2) -> d.name == d2.name
+    | errorType() -> true
+    | _ -> false
+    end;
+  top.structFields = just(d.fields);
+}
 -- Invariant: fields are in sorted order by name
-production objType
+production recordType
 top::Type ::= fs::[(String, Type)]
 {
   top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)}, ${f.2}", fs))}}";
   top.isEqualTo = \ other::Type ->
     case other of
-    | objType(otherFs) -> fs == otherFs
+    | recordType(otherFs) -> fs == otherFs
     | errorType() -> true
     | _ -> false
     end;
+  top.structFields = just(fs);
 }
 production fnType
 top::Type ::= args::[Type] ret::Type

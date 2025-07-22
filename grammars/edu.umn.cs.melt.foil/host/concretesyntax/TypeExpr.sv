@@ -13,7 +13,7 @@ concrete productions top::TypeExpr
 | 'unit'
   { abstract ext:unitTypeExpr; }
 | '{' fs::Fields '}'
-  { abstract ext:objTypeExpr; }
+  { abstract ext:recordTypeExpr; }
 | '(' args::TypeExprs ')' '->' ret::TypeExpr
   { abstract ext:fnTypeExpr; }
 

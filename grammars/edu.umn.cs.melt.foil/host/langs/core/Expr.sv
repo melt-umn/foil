@@ -83,15 +83,34 @@ top::Exprs ::=
     else [errFromOrigin(top, "Too few arguments to function")];
 }
 
-production newObject
+production recordLit
 top::Expr ::= fs::FieldExprs
 {
-  top.pp = pp"new {${ppImplode(pp", ", fs.pps)}}";
+  top.pp = pp"{${ppImplode(pp", ", fs.pps)}}";
   top.wrapPP = top.pp;
-  top.type = objType(sortByKey(fst, fs.fields));
+  top.type = recordType(sortByKey(fst, fs.fields));
 }
 
-tracked nonterminal FieldExprs with pps, env, fields, errors;
+production structLit
+top::Expr ::= n::Name fs::FieldExprs
+{
+  top.pp = pp"${n} {${ppImplode(pp", ", fs.pps)}}";
+  top.wrapPP = top.pp;
+  top.type = n.lookupType.type;
+  top.errors <- n.lookupType.lookupErrors;
+  top.errors <-
+    case n.lookupType.type of
+    | structType(dcl) -> fs.structFieldErrors
+    | errorType() -> []
+    | t -> [errFromOrigin(n, s"Expected struct type, but got ${show(80, t)}")]
+    end;
+  fs.expectedFields = n.lookupType.type.structFields.fromJust;
+}
+
+inherited attribute expectedFields::[(String, Type)];
+synthesized attribute structFieldErrors::[Message];
+
+tracked nonterminal FieldExprs with pps, env, fields, errors, expectedFields, structFieldErrors;
 propagate env, errors on FieldExprs;
 
 production consFieldExpr
@@ -102,14 +121,26 @@ top::FieldExprs ::= f::FieldExpr fs::FieldExprs
 
   top.errors <-
     if lookup(f.name, fs.fields).isJust
-    then [errFromOrigin(f, s"Duplicate field name '${f.name}' in object literal")]
+    then [errFromOrigin(f, s"Duplicate field '${f.name}' in struct literal")]
     else [];
+  
+  fs.expectedFields = filter(\ x::(String, Type) -> x.1 != f.name, fs.expectedFields);
+  top.structFieldErrors =
+    case lookup(f.name, fs.expectedFields) of
+    | just(ty) ->
+      if f.type == ty then []
+      else [errFromOrigin(f, s"Field '${f.name}' expected type ${show(80, ty)}, but got ${show(80, f.type)}")]
+    | nothing() -> [errFromOrigin(f, s"Unexpected field '${f.name}' in struct literal")]
+    end ++ fs.structFieldErrors;
 }
 production nilFieldExpr
 top::FieldExprs ::=
 {
   top.pps = [];
   top.fields = [];
+  top.structFieldErrors =
+    if null(top.expectedFields) then []
+    else [errFromOrigin(top, s"Struct literal missing fields ${implode(", ", map(\ f::(String, Type) -> s"'${f.1}'", top.expectedFields))}")];
 }
 
 tracked nonterminal FieldExpr with pp, env, name, type, errors;
@@ -130,20 +161,20 @@ top::Expr ::= e::Expr f::Name
   top.wrapPP = top.pp;
   top.isLValue = e.isLValue;
   top.type =
-    case e.type of
-    | objType(fs) when lookup(f.name, fs) matches just(ty) -> ty
+    case e.type.structFields of
+    | just(fs) when lookup(f.name, fs) matches just(ty) -> ty
     | _ -> errorType()
     end;
   top.errors <-
-    case e.type of
-    | objType(fs) ->
+    case e.type, e.type.structFields of
+    | errorType(), _ -> []
+    | _, just(fs) ->
       case lookup(f.name, fs) of
       | just(_) -> []
       | nothing() ->
-        [errFromOrigin(e, s"Object expression has type ${show(80, e.type)}, lacking field '${f.name}'")]
+        [errFromOrigin(e, s"Expression has type ${show(80, e.type)}, lacking field '${f.name}'")]
       end
-    | errorType() -> []
-    | t -> [errFromOrigin(e, s"Field access expected an object type, but got ${show(80, t)}")]
+    | t, _ -> [errFromOrigin(e, s"Value of type ${show(80, t)} does not have fields")]
     end;
 }
 

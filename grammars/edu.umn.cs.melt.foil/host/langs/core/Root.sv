@@ -4,31 +4,25 @@ tracked nonterminal Root with pp, errors;
 propagate errors on Root;
 
 production root
-top::Root ::= d::GlobalDecls
+top::Root ::= d::GlobalDecl
 {
-  top.pp = ppImplode(line(), d.pps);
-  d.env = emptyEnv();
-}
-
-tracked nonterminal GlobalDecls with pps, env, errors;
-propagate errors on GlobalDecls;
-
-production consGlobalDecl
-top::GlobalDecls ::= d::GlobalDecl ds::GlobalDecls
-{
-  top.pps = d.pp :: ds.pps;
-  d.env = top.env;
-  ds.env = addEnv(d.defs, ds.env);
-}
-production nilGlobalDecl
-top::GlobalDecls ::=
-{
-  top.pps = [];
+  top.pp = d.pp;
+  d.env = addEnv(d.defs, emptyEnv());
 }
 
 tracked nonterminal GlobalDecl with pp, env, defs, errors;
 propagate env, defs, errors on GlobalDecl;
 
+production appendGlobalDecl
+top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
+{
+  top.pp = pp"${d1}\n${d2}";
+}
+production emptyGlobalDecl
+top::GlobalDecl ::=
+{
+  top.pp = pp"";
+}
 production varGlobalDecl
 top::GlobalDecl ::= d::VarDecl
 {
@@ -38,4 +32,16 @@ production fnGlobalDecl
 top::GlobalDecl ::= d::FnDecl
 {
   top.pp = d.pp;
+}
+production structGlobalDecl
+top::GlobalDecl ::= d::StructDecl
+{
+  top.pp = d.pp;
+}
+
+instance Semigroup GlobalDecl {
+  append = appendGlobalDecl;
+}
+instance Monoid GlobalDecl {
+  mempty = emptyGlobalDecl();
 }

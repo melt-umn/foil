@@ -12,24 +12,26 @@ include edu:umn:cs:melt:foil:host:langs:core {
 
 translation pass toCore to edu:umn:cs:melt:foil:host:langs:core;
 attribute toCore occurs on
-  Root, GlobalDecls, GlobalDecl, VarDecl, FnDecl, Params, Param,
-  TypeExpr, TypeExprs, Fields, Field,
+  Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
+  StructDecl, Fields, Field,
+  TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
 propagate toCore on
-  Root, GlobalDecls, GlobalDecl, VarDecl, FnDecl, Params, Param,
-  TypeExpr, TypeExprs, Fields, Field,
+  Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
+  StructDecl, Fields, Field,
+  TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
 
 production fnDeclUnit
 top::FnDecl ::= n::Name params::Params body::Stmt
 {
   top.pp = pp"fun ${n}(${ppImplode(pp", ", params.pps)}) {${groupnestlines(2, body.pp)}";
-  forwards to fnDecl(@n, @params, unitTypeExpr(), @body);
+  forwards to fnDecl(@n, @params, recordTypeExpr(nilField()), @body);
 }
 
 production returnUnit
 top::Stmt ::= 
 {
   top.pp = pp"return;";
-  forwards to return_(unitLit());
+  forwards to return_(recordLit(nilFieldExpr()));
 }

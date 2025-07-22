@@ -9,7 +9,7 @@ top::VarDecl ::= n::Name t::TypeExpr i::Expr
   top.pp = pp"var ${n} : ${t} = ${i};";
   top.name = n.name;
   top.type = t.type;
-  top.defs := valueDef(varValueItem(top));
+  top.defs := valueDefs([varValueItem(top)]);
   top.errors <-
     if t.type == i.type then []
     else [errFromOrigin(i, s"Initialization expected ${show(80, t.type)}, but got ${show(80, i.type)}")];
@@ -28,7 +28,7 @@ top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
   top.name = n.name;
   top.paramTypes = params.paramTypes;
   top.retType = ret.type;
-  top.defs := valueDef(fnValueItem(top));
+  top.defs := valueDefs([fnValueItem(top)]);
 
   body.returnType = just(ret.type);
 
@@ -37,7 +37,7 @@ top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
   body.env = addEnv(params.defs, top.env);
 
   top.errors <-
-    if ret.type == unitType() || body.hasReturn then []
+    if ret.type == recordType([]) || body.hasReturn then []
     else [errFromOrigin(body, s"Function ${n.name} must return a value of type ${show(80, ret.type)}")];
 }
 
@@ -66,5 +66,20 @@ top::Param ::= n::Name t::TypeExpr
   top.pp = pp"${n} : ${t}";
   top.name = n.name;
   top.type = t.type;
-  top.defs := valueDef(paramValueItem(top));
+  top.defs := valueDefs([paramValueItem(top)]);
+}
+
+tracked nonterminal StructDecl with pp, env, name, fields, defs, errors;
+propagate env, errors on StructDecl;
+
+production structDecl
+top::StructDecl ::= n::Name fs::Fields
+{
+  top.pp = pp"struct ${n} {${groupnestlines(2, ppImplode(pp",\n", fs.pps))}}";
+  top.name = n.name;
+  top.fields = fs.fields;
+  top.defs := typeDefs([structTypeItem(top)]);
+  top.errors <-
+    if null(fs.errors) then []
+    else fs.errors;
 }

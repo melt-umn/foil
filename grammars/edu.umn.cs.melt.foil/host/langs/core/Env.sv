@@ -4,10 +4,13 @@ monoid attribute defs::Defs;
 inherited attribute env::Env;
 
 monoid attribute valueContribs::Contribs<ValueItem>;
-synthesized attribute values::Scopes<ValueItem>;
+synthesized attribute valueScopes::Scopes<ValueItem>;
 
-closed data nonterminal Defs with valueContribs;
-propagate valueContribs on Defs;
+monoid attribute typeContribs::Contribs<TypeItem>;
+synthesized attribute typeScopes::Scopes<TypeItem>;
+
+closed data nonterminal Defs with valueContribs, typeContribs;
+propagate valueContribs, typeContribs on Defs;
 
 aspect default production
 top::Defs ::=
@@ -20,10 +23,15 @@ top::Defs ::= d1::Defs d2::Defs
 production emptyDefs
 top::Defs ::=
 {}
-production valueDef
-top::Defs ::= i::ValueItem
+production valueDefs
+top::Defs ::= is::[ValueItem]
 {
-  top.valueContribs <- [(i.name, i)];
+  top.valueContribs <- map(\ i::ValueItem -> (i.name, i), is);
+}
+production typeDefs
+top::Defs ::= is::[TypeItem]
+{
+  top.typeContribs <- map(\ i::TypeItem -> (i.name, i), is);
 }
 
 instance Semigroup Defs {
@@ -33,25 +41,29 @@ instance Monoid Defs {
   mempty = emptyDefs();
 }
 
-data nonterminal Env with values;
+data nonterminal Env with valueScopes, typeScopes;
 
 production emptyEnv
 top::Env ::=
 {
-  top.values = emptyScope();
+  top.valueScopes = emptyScope();
+  top.typeScopes = emptyScope();
 }
 production addEnv
 top::Env ::= d::Defs e::Env
 {
-  top.values = addScope(d.valueContribs, e.values);
+  top.valueScopes = addScope(d.valueContribs, e.valueScopes);
+  top.typeScopes = addScope(d.typeContribs, e.typeScopes);
 }
 production openScopeEnv
 top::Env ::= e::Env
 {
-  top.values = openScope(e.values);
+  top.valueScopes = openScope(e.valueScopes);
+  top.typeScopes = openScope(e.typeScopes);
 }
 
 synthesized attribute lookupErrors::[Message];
+
 data nonterminal ValueItem with name, type, lookupErrors, isLValue;
 aspect default production
 top::ValueItem ::=
@@ -88,4 +100,25 @@ top::ValueItem ::= name::String
   top.isLValue = true;
 }
 
-fun lookupValue [ValueItem] ::= n::String e::Env = lookupScope(n, e.values);
+data nonterminal TypeItem with name, type, lookupErrors;
+aspect default production
+top::TypeItem ::=
+{
+  top.lookupErrors = [];
+}
+production structTypeItem
+top::TypeItem ::= d::Decorated StructDecl
+{
+  top.name = d.name;
+  top.type = structType(d);
+}
+production errorTypeItem
+top::TypeItem ::= name::String
+{
+  top.name = name;
+  top.type = errorType();
+  top.lookupErrors = [errFromOrigin(top, s"Undefined type ${name}")];
+}
+
+fun lookupValue [ValueItem] ::= n::String e::Env = lookupScope(n, e.valueScopes);
+fun lookupType [TypeItem] ::= n::String e::Env = lookupScope(n, e.typeScopes);

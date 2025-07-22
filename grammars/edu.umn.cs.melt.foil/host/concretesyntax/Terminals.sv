@@ -45,6 +45,8 @@ terminal False_t       'false'  lexer classes {Keyword};
 terminal Let_t         'let'    lexer classes {Keyword};
 terminal In_t          'in'     lexer classes {Keyword};
 terminal End_t         'end'    lexer classes {Keyword};
+terminal Record_t      'record' lexer classes {Keyword};
+terminal Struct_t      'struct' lexer classes {Keyword};
 
 terminal Int_t          'int'    lexer classes {Type};
 terminal Float_t        'float'  lexer classes {Type};

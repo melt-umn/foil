@@ -5,12 +5,12 @@ concrete productions top::Root
 | ds::GlobalDecls
   { abstract ext:root; }
 
-tracked nonterminal GlobalDecls with ast<ext:GlobalDecls>;
+tracked nonterminal GlobalDecls with ast<ext:GlobalDecl>;
 concrete productions top::GlobalDecls
 | d::GlobalDecl ds::GlobalDecls
-  { abstract ext:consGlobalDecl; }
+  { abstract ext:appendGlobalDecl; }
 |
-  { abstract ext:nilGlobalDecl; }
+  { abstract ext:emptyGlobalDecl; }
 
 closed tracked nonterminal GlobalDecl with ast<ext:GlobalDecl>;
 concrete productions top::GlobalDecl
@@ -18,6 +18,8 @@ concrete productions top::GlobalDecl
   { abstract ext:varGlobalDecl; }
 | d::FnDecl
   { abstract ext:fnGlobalDecl; }
+| d::StructDecl
+  { abstract ext:structGlobalDecl; }
 
 closed tracked nonterminal VarDecl with ast<ext:VarDecl>;
 concrete productions top::VarDecl
@@ -44,3 +46,8 @@ closed tracked nonterminal Param with ast<ext:Param>;
 concrete productions top::Param
 | n::Name ':' t::TypeExpr
   { abstract ext:param; }
+
+closed tracked nonterminal StructDecl with ast<ext:StructDecl>;
+concrete productions top::StructDecl
+| 'struct' n::Name '{' fs::Fields '}'
+  { abstract ext:structDecl; }

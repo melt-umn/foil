@@ -35,11 +35,11 @@ top::TypeExpr ::=
   top.pp = pp"unit";
   top.type = unitType();
 }
-production objTypeExpr
+production recordTypeExpr
 top::TypeExpr ::= fs::Fields
 {
   top.pp = pp"{${ppImplode(pp", ", fs.pps)}}";
-  top.type = objType(sortByKey(fst, fs.fields));
+  top.type = recordType(sortByKey(fst, fs.fields));
 }
 production fnTypeExpr
 top::TypeExpr ::= args::TypeExprs ret::TypeExpr
@@ -83,7 +83,7 @@ top::Fields ::= f::Field fs::Fields
   top.fields = (f.name, f.type) :: fs.fields;
   top.errors <-
     if lookup(f.name, fs.fields).isJust
-    then [errFromOrigin(f, s"Duplicate field name '${f.name}' in object literal")]
+    then [errFromOrigin(f, s"Duplicate field name '${f.name}'")]
     else [];
 }
 
