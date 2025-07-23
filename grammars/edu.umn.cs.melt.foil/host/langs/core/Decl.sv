@@ -83,3 +83,18 @@ top::StructDecl ::= n::Name fs::Fields
     if null(fs.errors) then []
     else fs.errors;
 }
+
+tracked nonterminal UnionDecl with pp, env, name, fields, defs, errors;
+propagate env, errors on UnionDecl;
+
+production unionDecl
+top::UnionDecl ::= n::Name fs::Fields
+{
+  top.pp = pp"union ${n} {${groupnestlines(2, ppImplode(pp",\n", fs.pps))}}";
+  top.name = n.name;
+  top.fields = fs.fields;
+  top.defs := typeDefs([unionTypeItem(top)]);
+  top.errors <-
+    if null(fs.errors) then []
+    else fs.errors;
+}

@@ -38,6 +38,11 @@ top::GlobalDecl ::= d::StructDecl
 {
   top.pp = d.pp;
 }
+production unionGlobalDecl
+top::GlobalDecl ::= d::UnionDecl
+{
+  top.pp = d.pp;
+}
 
 instance Semigroup GlobalDecl {
   append = appendGlobalDecl;

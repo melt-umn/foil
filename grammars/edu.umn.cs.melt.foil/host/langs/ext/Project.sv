@@ -13,12 +13,12 @@ include edu:umn:cs:melt:foil:host:langs:core {
 translation pass toCore to edu:umn:cs:melt:foil:host:langs:core;
 attribute toCore occurs on
   Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
-  StructDecl, Fields, Field,
+  StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
 propagate toCore on
   Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
-  StructDecl, Fields, Field,
+  StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
 

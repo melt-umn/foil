@@ -20,6 +20,8 @@ concrete productions top::GlobalDecl
   { abstract ext:fnGlobalDecl; }
 | d::StructDecl
   { abstract ext:structGlobalDecl; }
+| d::UnionDecl
+  { abstract ext:unionGlobalDecl; }
 
 closed tracked nonterminal VarDecl with ast<ext:VarDecl>;
 concrete productions top::VarDecl
@@ -51,3 +53,8 @@ closed tracked nonterminal StructDecl with ast<ext:StructDecl>;
 concrete productions top::StructDecl
 | 'struct' n::Name '{' fs::Fields '}'
   { abstract ext:structDecl; }
+
+closed tracked nonterminal UnionDecl with ast<ext:UnionDecl>;
+concrete productions top::UnionDecl
+| 'union' n::Name '{' fs::Fields '}'
+  { abstract ext:unionDecl; }

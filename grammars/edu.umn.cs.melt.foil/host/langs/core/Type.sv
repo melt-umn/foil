@@ -91,19 +91,19 @@ top::Type ::= d::Decorated StructDecl
     end;
   top.structFields = just(d.fields);
 }
--- Invariant: fields are in sorted order by name
-production recordType
-top::Type ::= fs::[(String, Type)]
+production unionType
+top::Type ::= d::Decorated UnionDecl
 {
-  top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)}, ${f.2}", fs))}}";
+  top.pp = pp"union ${text(d.name)}";
   top.isEqualTo = \ other::Type ->
     case other of
-    | recordType(otherFs) -> fs == otherFs
+    | unionType(d2) -> d.name == d2.name
     | errorType() -> true
     | _ -> false
     end;
-  top.structFields = just(fs);
+  top.structFields = just(d.fields);
 }
+
 production fnType
 top::Type ::= args::[Type] ret::Type
 {

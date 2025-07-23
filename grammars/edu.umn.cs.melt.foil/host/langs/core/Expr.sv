@@ -175,16 +175,18 @@ top::Expr ::= n::Name fs::FieldExprs
   top.errors <-
     case n.lookupType.type of
     | structType(dcl) -> fs.structFieldErrors
+    | unionType(dcl) -> fs.unionFieldErrors
     | errorType() -> []
-    | t -> [errFromOrigin(n, s"Expected struct type, but got ${show(80, t)}")]
+    | t -> [errFromOrigin(n, s"Expected struct or union type, but got ${show(80, t)}")]
     end;
   fs.expectedFields = n.lookupType.type.structFields.fromJust;
 }
 
 inherited attribute expectedFields::[(String, Type)];
 synthesized attribute structFieldErrors::[Message];
+synthesized attribute unionFieldErrors::[Message];
 
-tracked nonterminal FieldExprs with pps, env, fields, errors, expectedFields, structFieldErrors;
+tracked nonterminal FieldExprs with pps, env, fields, errors, expectedFields, structFieldErrors, unionFieldErrors;
 propagate env, errors on FieldExprs;
 
 production consFieldExpr
@@ -206,6 +208,15 @@ top::FieldExprs ::= f::FieldExpr fs::FieldExprs
       else [errFromOrigin(f, s"Field '${f.name}' expected type ${show(80, ty)}, but got ${show(80, f.type)}")]
     | nothing() -> [errFromOrigin(f, s"Unexpected field '${f.name}' in struct literal")]
     end ++ fs.structFieldErrors;
+  top.unionFieldErrors =
+    case lookup(f.name, fs.expectedFields) of
+    | just(ty) ->
+      if f.type == ty then []
+      else [errFromOrigin(f, s"Field '${f.name}' expected type ${show(80, ty)}, but got ${show(80, f.type)}")]
+    | nothing() -> [errFromOrigin(f, s"Unexpected field '${f.name}' in union literal")]
+    end ++
+    if null(fs.fields) then []
+    else [errFromOrigin(f, s"Union literal expected exactly one field")];
 }
 production nilFieldExpr
 top::FieldExprs ::=
@@ -215,6 +226,7 @@ top::FieldExprs ::=
   top.structFieldErrors =
     if null(top.expectedFields) then []
     else [errFromOrigin(top, s"Struct literal missing fields ${implode(", ", map(\ f::(String, Type) -> s"'${f.1}'", top.expectedFields))}")];
+  top.unionFieldErrors = [errFromOrigin(top, s"Union literal expected exactly one field")];
 }
 
 tracked nonterminal FieldExpr with pp, env, name, type, errors;

@@ -95,7 +95,6 @@ top::Stmt ::= e::Expr
     end;
 }
 
-
 instance Semigroup Stmt {
   append = seq;
 }

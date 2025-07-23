@@ -112,6 +112,12 @@ top::TypeItem ::= d::Decorated StructDecl
   top.name = d.name;
   top.type = structType(d);
 }
+production unionTypeItem
+top::TypeItem ::= d::Decorated UnionDecl
+{
+  top.name = d.name;
+  top.type = unionType(d);
+}
 production errorTypeItem
 top::TypeItem ::= name::String
 {
