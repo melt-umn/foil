@@ -47,12 +47,14 @@ top::Expr ::= f::Expr a::Exprs
     | _ -> []
     end;
   a.position = 1;
+  top.errors <- a.callErrors;
 }
 
 inherited attribute expectedTypes::[Type];
 inherited attribute position::Integer;
+synthesized attribute callErrors::[Message];
 
-tracked nonterminal Exprs with pps, env, types, expectedTypes, position, errors;
+tracked nonterminal Exprs with pps, env, types, expectedTypes, position, errors, callErrors;
 propagate env, errors on Exprs;
 
 production consExpr
@@ -64,13 +66,13 @@ top::Exprs ::= e::Expr es::Exprs
     if null(top.expectedTypes) then [] else tail(top.expectedTypes);
   es.position = top.position + 1;
 
-  top.errors <-
+  top.callErrors =
     case top.expectedTypes of
     | [] -> [errFromOrigin(top, "Too many arguments to function")]
     | t :: _ when e.type != t ->
       [errFromOrigin(e, s"Argument ${toString(top.position)} expected ${show(80, t.pp)}, but found ${show(80, e.type)}")]
     | _ -> []
-    end;
+    end ++ es.callErrors;
 }
 production nilExpr
 top::Exprs ::=
@@ -78,7 +80,7 @@ top::Exprs ::=
   top.pps = [];
   top.types = [];
 
-  top.errors <-
+  top.callErrors =
     if null(top.expectedTypes) then []
     else [errFromOrigin(top, "Too few arguments to function")];
 }
@@ -157,13 +159,6 @@ top::Expr ::= es::Exprs
   top.errors <-
     if all(map(\ t::Type -> t == elemType, es.types)) then []
     else [errFromOrigin(es, s"Array literal expected elements of type ${show(80, elemType)}, but got ${show(80, es.types)}")];
-}
-production recordLit
-top::Expr ::= fs::FieldExprs
-{
-  top.pp = pp"{${ppImplode(pp", ", fs.pps)}}";
-  top.wrapPP = top.pp;
-  top.type = recordType(sortByKey(fst, fs.fields));
 }
 production structLit
 top::Expr ::= n::Name fs::FieldExprs

@@ -1,5 +1,7 @@
 grammar edu:umn:cs:melt:foil:host:langs:core;
 
+-- TODO: name should be a common NT shared between all languages
+
 synthesized attribute name::String;
 synthesized attribute lookupValue::ValueItem;
 synthesized attribute lookupType::TypeItem;

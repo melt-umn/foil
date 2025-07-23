@@ -20,8 +20,6 @@ concrete productions top::Expr
   { abstract ext:newArray; }
 | 'new' '[' ']' '{' e::Exprs '}' 
   { abstract ext:arrayLit; }
-| 'record' '{' fs::FieldExprs '}'
-  { abstract ext:recordLit; }
 | n::Name '{' fs::FieldExprs '}'
   { abstract ext:structLit; }
 | e1::Expr '.' n::Name

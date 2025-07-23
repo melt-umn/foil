@@ -16,8 +16,6 @@ concrete productions top::TypeExpr
   { abstract ext:pointerTypeExpr; }
 | t::TypeExpr '[' ']'
   { abstract ext:arrayTypeExpr; }
-| '{' fs::Fields '}'
-  { abstract ext:recordTypeExpr; }
 | '(' args::TypeExprs ')' '->' ret::TypeExpr
   { abstract ext:fnTypeExpr; }
 

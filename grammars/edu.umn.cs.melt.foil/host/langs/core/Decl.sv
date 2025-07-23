@@ -37,7 +37,7 @@ top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
   body.env = addEnv(params.defs, top.env);
 
   top.errors <-
-    if ret.type == recordType([]) || body.hasReturn then []
+    if ret.type == unitType() || body.hasReturn then []
     else [errFromOrigin(body, s"Function ${n.name} must return a value of type ${show(80, ret.type)}")];
 }
 
@@ -97,4 +97,37 @@ top::UnionDecl ::= n::Name fs::Fields
   top.errors <-
     if null(fs.errors) then []
     else fs.errors;
+}
+
+synthesized attribute fields::[(String, Type)];
+
+tracked nonterminal Fields with pps, env, fields, errors;
+propagate env, errors on Fields;
+
+production nilField
+top::Fields ::=
+{
+  top.pps = [];
+  top.fields = [];
+}
+production consField
+top::Fields ::= f::Field fs::Fields
+{
+  top.pps = f.pp :: fs.pps;
+  top.fields = (f.name, f.type) :: fs.fields;
+  top.errors <-
+    if lookup(f.name, fs.fields).isJust
+    then [errFromOrigin(f, s"Duplicate field name '${f.name}'")]
+    else [];
+}
+
+tracked nonterminal Field with pp, env, name, type, errors;
+propagate env, errors on Field;
+
+production field
+top::Field ::= n::Name ty::TypeExpr
+{
+  top.pp = pp"${n} : ${ty}";
+  top.name = n.name;
+  top.type = ty.type;
 }

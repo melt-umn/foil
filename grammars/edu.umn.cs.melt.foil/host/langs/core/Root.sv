@@ -8,15 +8,20 @@ top::Root ::= d::GlobalDecl
 {
   top.pp = d.pp;
   d.env = addEnv(d.defs, emptyEnv());
+  d.declaredEnv = emptyEnv();
 }
 
-tracked nonterminal GlobalDecl with pp, env, defs, errors;
+inherited attribute declaredEnv::Env;  -- Env defs declared so far
+
+tracked nonterminal GlobalDecl with pp, env, declaredEnv, defs, errors;
 propagate env, defs, errors on GlobalDecl;
 
 production appendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {
   top.pp = pp"${d1}\n${d2}";
+  d1.declaredEnv = top.declaredEnv;
+  d2.declaredEnv = addEnv(d1.defs, d1.declaredEnv);
 }
 production emptyGlobalDecl
 top::GlobalDecl ::=
@@ -44,8 +49,20 @@ top::GlobalDecl ::= d::UnionDecl
   top.pp = d.pp;
 }
 
+production mkAppendGlobalDecl
+top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
+{
+  propagate env;
+  forwards to
+    case d1, d2 of
+    | emptyGlobalDecl(), _ -> @d2
+    | _, emptyGlobalDecl() -> @d1
+    | _, _ -> appendGlobalDecl(@d1, @d2)
+    end;
+}
+
 instance Semigroup GlobalDecl {
-  append = appendGlobalDecl;
+  append = mkAppendGlobalDecl;
 }
 instance Monoid GlobalDecl {
   mempty = emptyGlobalDecl();
