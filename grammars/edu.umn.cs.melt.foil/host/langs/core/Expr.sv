@@ -83,6 +83,81 @@ top::Exprs ::=
     else [errFromOrigin(top, "Too few arguments to function")];
 }
 
+production deref
+top::Expr ::= e::Expr
+{
+  top.pp = pp"*${e.wrapPP}";
+  top.wrapPP = parens(top.pp);
+  top.isLValue = true;
+  top.type =
+    case e.type of
+    | pointerType(t) -> t
+    | _ -> errorType()
+    end;
+  top.errors <-
+    case e.type of
+    | pointerType(_) -> []
+    | errorType() -> []
+    | _ -> [errFromOrigin(e, s"Dereference expected a pointer type, but got ${show(80, e.type)}")]
+    end;
+}
+production arraySubscript
+top::Expr ::= e::Expr i::Expr
+{
+  top.pp = pp"${e.wrapPP}[${i.wrapPP}]";
+  top.wrapPP = parens(top.pp);
+  top.isLValue = true;
+  top.type =
+    case e.type of
+    | arrayType(t) -> t
+    | _ -> errorType()
+    end;
+  top.errors <-
+    case e.type of
+    | arrayType(_) -> []
+    | errorType() -> []
+    | _ -> [errFromOrigin(e, s"Array subscript expected an array type, but got ${show(80, e.type)}")]
+    end;
+  top.errors <-
+    if i.type == intType() then []
+    else [errFromOrigin(i, s"Array subscript expected an int, but got ${show(80, i.type)}")];
+}
+production newPointer
+top::Expr ::= init::Expr
+{
+  top.pp = pp"new ${init.wrapPP}";
+  top.wrapPP = parens(top.pp);
+  top.type = pointerType(init.type);
+}
+production newArray
+top::Expr ::= size::Expr init::Expr
+{
+  top.pp = pp"new[${size}] ${init.wrapPP}";
+  top.wrapPP = parens(top.pp);
+  top.type = arrayType(init.type);
+  top.errors <-
+    if size.type == intType() then []
+    else [errFromOrigin(size, s"Array size expected an int, but got ${show(80, size.type)}")];
+}
+-- TODO: Could be an extension?
+production arrayLit
+top::Expr ::= es::Exprs
+{
+  top.pp = pp"new[] {${ppImplode(pp", ", es.pps)}}";
+  top.wrapPP = parens(top.pp);
+  local elemType::Type =
+    case es.types of
+    | t :: _ -> t
+    | [] -> errorType()
+    end;
+  top.type = arrayType(elemType);
+  top.errors <-
+    if !null(es.types) then []
+    else [errFromOrigin(es, "Array literal expected at least one element")];
+  top.errors <-
+    if all(map(\ t::Type -> t == elemType, es.types)) then []
+    else [errFromOrigin(es, s"Array literal expected elements of type ${show(80, elemType)}, but got ${show(80, es.types)}")];
+}
 production recordLit
 top::Expr ::= fs::FieldExprs
 {
@@ -90,7 +165,6 @@ top::Expr ::= fs::FieldExprs
   top.wrapPP = top.pp;
   top.type = recordType(sortByKey(fst, fs.fields));
 }
-
 production structLit
 top::Expr ::= n::Name fs::FieldExprs
 {

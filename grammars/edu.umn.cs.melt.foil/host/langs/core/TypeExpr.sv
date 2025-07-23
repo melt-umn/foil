@@ -35,6 +35,18 @@ top::TypeExpr ::=
   top.pp = pp"unit";
   top.type = unitType();
 }
+production pointerTypeExpr
+top::TypeExpr ::= t::TypeExpr
+{
+  top.pp = pp"${t.pp} *";
+  top.type = pointerType(t.type);
+}
+production arrayTypeExpr
+top::TypeExpr ::= t::TypeExpr
+{
+  top.pp = pp"${t.pp}[]";
+  top.type = arrayType(t.type);
+}
 production recordTypeExpr
 top::TypeExpr ::= fs::Fields
 {

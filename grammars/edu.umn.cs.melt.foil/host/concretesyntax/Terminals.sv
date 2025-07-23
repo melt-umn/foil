@@ -25,11 +25,13 @@ terminal LParen_t      '('  precedence = 24;  -- precedence is needed for functi
 terminal RParen_t      ')'  precedence = 1, association = left;  -- precedence/association for dangling-else
 terminal LCurly_t      '{'  ;
 terminal RCurly_t      '}'  ;
+terminal LBracket_t    '['  precedence = 24;  -- precedence is needed for array access
+terminal RBracket_t    ']'  precedence = 4;   -- precedence is needed for array instance
 terminal Dot_t         '.'  precedence = 25, association = left;
 terminal Semi_t        ';'  ;
 terminal Colon_t       ':'  precedence = 3, association = left;
 terminal UnderScore_t  '_'  ;
-terminal Arrow_t       '->' ;
+terminal Arrow_t       '->' precedence = 4;
 terminal Equals_t      '='  ;
 terminal Question_t    '?'  precedence = 3, association = left;
 
@@ -39,7 +41,7 @@ terminal If_t          'if'     lexer classes {Keyword};
 terminal Else_t        'else'   lexer classes {Keyword}, precedence = 2, association = left;
 terminal While_t       'while'  lexer classes {Keyword};
 terminal Return_t      'return' lexer classes {Keyword};
-terminal New_t         'new'    lexer classes {Keyword};
+terminal New_t         'new'    lexer classes {Keyword}, precedence = 4;
 terminal True_t        'true'   lexer classes {Keyword};
 terminal False_t       'false'  lexer classes {Keyword};
 terminal Let_t         'let'    lexer classes {Keyword};

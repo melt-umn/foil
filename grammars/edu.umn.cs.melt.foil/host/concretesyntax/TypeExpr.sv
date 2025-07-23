@@ -12,6 +12,10 @@ concrete productions top::TypeExpr
   { abstract ext:stringTypeExpr; }
 | 'unit'
   { abstract ext:unitTypeExpr; }
+| t::TypeExpr '*'
+  { abstract ext:pointerTypeExpr; }
+| t::TypeExpr '[' ']'
+  { abstract ext:arrayTypeExpr; }
 | '{' fs::Fields '}'
   { abstract ext:recordTypeExpr; }
 | '(' args::TypeExprs ')' '->' ret::TypeExpr

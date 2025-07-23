@@ -57,6 +57,28 @@ top::Type ::=
     | _ -> false
     end;
 }
+production pointerType
+top::Type ::= t::Type
+{
+  top.pp = pp"${t.pp}*";
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | pointerType(otherT) -> t == otherT
+    | errorType() -> true
+    | _ -> false
+    end;
+}
+production arrayType
+top::Type ::= t::Type
+{
+  top.pp = pp"${t.pp}[]";
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | arrayType(otherT) -> t == otherT
+    | errorType() -> true
+    | _ -> false
+    end;
+}
 production structType
 top::Type ::= d::Decorated StructDecl
 {
