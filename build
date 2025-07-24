@@ -17,9 +17,13 @@ export GRAMMAR_PATH="foil.jar:$GRAMMAR_PATH"
 silver -o foil-records.jar "$@" edu:umn:cs:melt:foil:extensions:records
 export GRAMMAR_PATH="foil-records.jar:$GRAMMAR_PATH"
 
-# Build composition artifacts
-silver -o composed_host.jar "$@" edu:umn:cs:melt:foil:composed:host
-silver -o composed_records.jar "$@" edu:umn:cs:melt:foil:composed:with_records
+silver -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
+export GRAMMAR_PATH="foil-complex.jar:$GRAMMAR_PATH"
+
+# Build compiler
+#silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:host
+#silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_records
+silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_all
 
 # Perform MDA tests
-silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests
+#silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests
