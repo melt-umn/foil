@@ -54,12 +54,19 @@ top::TypeExpr ::= t::TypeExpr
   top.pp = pp"${t.pp}[]";
   top.type = arrayType(t.type);
 }
+production recordTypeExpr
+top::TypeExpr ::= fs::Fields
+{
+  top.pp = pp"record {${ppImplode(pp", ", fs.pps)}}";
+  top.type = recordType(sortByKey(fst, fs.fields));
+}
 production fnTypeExpr
 top::TypeExpr ::= args::TypeExprs ret::TypeExpr
 {
   top.pp = pp"(${ppImplode(pp", ", args.pps)}) -> ${ret.pp}";
   top.type = fnType(args.types, ret.type);
 }
+
 synthesized attribute types::[Type];
 
 tracked nonterminal TypeExprs with pps, env, types, errors;

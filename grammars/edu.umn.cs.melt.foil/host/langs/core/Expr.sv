@@ -178,6 +178,13 @@ top::Expr ::= n::Name fs::FieldExprs
     end;
   fs.expectedFields = n.lookupType.type.structFields.fromJust;
 }
+production recordLit
+top::Expr ::= fs::FieldExprs
+{
+  top.pp = pp"record {${ppImplode(pp", ", fs.pps)}}";
+  top.wrapPP = top.pp;
+  top.type = recordType(sortByKey(fst, fs.fields));
+}
 
 inherited attribute expectedFields::[(String, Type)];
 synthesized attribute structFieldErrors::[Message];

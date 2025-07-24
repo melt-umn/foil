@@ -135,6 +135,21 @@ top::Type ::= d::Decorated UnionDecl
     end;
   top.structFields = just(d.fields);
 }
+-- Invariant: fields are in sorted order by name
+production recordType
+top::Type ::= fs::[(String, Type)]
+{
+  top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)}, ${f.2}", fs))}}";
+  top.mangledName = "record_" ++ implode("_", map(\ f::(String, Type) -> f.1 ++ "_" ++ f.2.mangledName, fs)) ++ "_";
+  top.typeExpr = nameTypeExpr(name("_" ++ top.mangledName));
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | recordType(otherFs) -> fs == otherFs
+    | errorType() -> true
+    | _ -> false
+    end;
+  top.structFields = just(fs);
+}
 production fnType
 top::Type ::= args::[Type] ret::Type
 {

@@ -6,7 +6,6 @@ imports edu:umn:cs:melt:foil:host:driver;
 
 parser foilParser :: cnc:Root {
   edu:umn:cs:melt:foil:host;
-  edu:umn:cs:melt:foil:extensions:records;
   edu:umn:cs:melt:foil:extensions:complex;
 }
 

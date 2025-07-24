@@ -17,6 +17,15 @@ top::VarDecl ::= n::Name t::TypeExpr i::Expr
     if t.type == i.type then []
     else [errFromOrigin(i, s"Initialization expected ${show(80, t.type)}, but got ${show(80, i.type)}")];
 }
+production autoVarDecl
+top::VarDecl ::= n::Name i::Expr
+{
+  top.pp = pp"var ${n} = ${i};";
+  top.name = n.name;
+  top.type = i.type;
+  top.initExpr = i;
+  top.defs := valueDefs([varValueItem(top)]);
+}
 
 synthesized attribute paramTypes::[Type];
 synthesized attribute retType::Type;

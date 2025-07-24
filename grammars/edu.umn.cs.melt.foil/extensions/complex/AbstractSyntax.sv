@@ -22,13 +22,12 @@ top::TypeExpr ::=
   top.type = complexType();
   top.errors := [];
 
-  forward trans =
-    recordTypeExpr(
-      consField(field(name("real"), floatTypeExpr()),
-        consField(field(name("imag"), floatTypeExpr()),
-          nilField())));
-  top.liftedDecls = @trans.liftedDecls;
-  top.toCore = @trans.toCore;
+  top.toCore =
+    core:recordTypeExpr(
+      core:consField(core:field(name("real"), core:floatTypeExpr()),
+        core:consField(core:field(name("imag"), core:floatTypeExpr()),
+          core:nilField())));
+  propagate liftedDecls;
 }
 
 production complexLit
@@ -45,14 +44,19 @@ top::Expr ::= real::Expr imag::Expr
     if imag.type == floatType() then []
     else [errFromOrigin(real, s"Imaginary part must be of type float, got ${show(80, real.type)}")];
   
-  forward trans =
-    recordLit(
-      consFieldExpr(fieldExpr(name("real"), @real),
-        consFieldExpr(fieldExpr(name("imag"), @imag),
-          nilFieldExpr())));
-  top.liftedDecls = @trans.liftedDecls;
-  top.toCore = @trans.toCore;
+  top.toCore = complexLitImpl(@real.toCore, @imag.toCore);
+  propagate liftedDecls;
 }
+production complexLitImpl
+top::core:Expr ::= real::core:Expr imag::core:Expr
+{
+  forwards to
+    core:recordLit(
+      core:consFieldExpr(core:fieldExpr(name("real"), @real),
+        core:consFieldExpr(core:fieldExpr(name("imag"), @imag),
+          core:nilFieldExpr())));
+}
+
 production realPart
 top::Expr ::= e::Expr
 {
@@ -64,9 +68,8 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  forward trans = fieldAccess(@e, name("real"));
-  top.liftedDecls = @trans.liftedDecls;
-  top.toCore = @trans.toCore;
+  top.toCore = core:fieldAccess(@e.toCore, name("real"));
+  propagate liftedDecls;
 }
 production imagPart
 top::Expr ::= e::Expr
@@ -79,9 +82,8 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  forward trans = fieldAccess(@e, name("imag"));
-  top.liftedDecls = @trans.liftedDecls;
-  top.toCore = @trans.toCore;
+  top.toCore = core:fieldAccess(@e.toCore, name("imag"));
+  propagate liftedDecls;
 }
 production complexConj
 top::Expr ::= e::Expr
@@ -94,11 +96,10 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
   
-  forward trans = let_(
-    varDecl(name("a"), complexTypeExpr(), @e),
-    complexLit(
-      fieldAccess(var(name("a")), name("real")),
-      negOp(fieldAccess(var(name("a")), name("imag")))));
-  top.liftedDecls = @trans.liftedDecls;
-  top.toCore = @trans.toCore;
+  top.toCore = core:let_(
+    core:autoVarDecl(name("a"), @e.toCore),
+    complexLitImpl(
+      core:fieldAccess(core:var(name("a")), name("real")),
+      core:negOp(core:fieldAccess(core:var(name("a")), name("imag")))));
+  propagate liftedDecls;
 }

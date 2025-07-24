@@ -14,15 +14,11 @@ silver -o foil.jar "$@" edu:umn:cs:melt:foil:host
 export GRAMMAR_PATH="foil.jar:$GRAMMAR_PATH"
 
 # Build extensions
-silver -o foil-records.jar "$@" edu:umn:cs:melt:foil:extensions:records
-export GRAMMAR_PATH="foil-records.jar:$GRAMMAR_PATH"
-
 silver -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
 export GRAMMAR_PATH="foil-complex.jar:$GRAMMAR_PATH"
 
 # Build compiler
 #silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:host
-#silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_records
 silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_all
 
 # Perform MDA tests

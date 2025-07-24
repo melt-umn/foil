@@ -50,6 +50,7 @@ terminal In_t          'in'     lexer classes {Keyword, Reserved};
 terminal End_t         'end'    lexer classes {Keyword, Reserved};
 terminal Struct_t      'struct' lexer classes {Keyword, Reserved};
 terminal Union_t       'union'  lexer classes {Keyword, Reserved};
+terminal Record_t      'record' lexer classes {Keyword, Reserved};
 
 terminal Int_t          'int'    lexer classes {Type, Reserved};
 terminal Float_t        'float'  lexer classes {Type, Reserved};

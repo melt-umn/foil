@@ -27,6 +27,8 @@ closed tracked nonterminal VarDecl with ast<ext:VarDecl>;
 concrete productions top::VarDecl
 | 'var' n::Name ':' t::TypeExpr '=' e::Expr
   { abstract ext:varDecl; }
+| 'var' n::Name '=' e::Expr
+  { abstract ext:autoVarDecl; }
 
 closed tracked nonterminal FnDecl with ast<ext:FnDecl>;
 concrete productions top::FnDecl
