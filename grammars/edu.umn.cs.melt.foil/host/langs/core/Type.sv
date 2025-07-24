@@ -110,7 +110,7 @@ top::Type ::= t::Type
 production structType
 top::Type ::= d::Decorated StructDecl
 {
-  top.pp = pp"struct ${text(d.name)}";
+  top.pp = text(d.name);
   top.mangledName = s"struct_${d.name}_";
   top.typeExpr = nameTypeExpr(name(d.name));
   top.isEqualTo = \ other::Type ->
@@ -124,7 +124,7 @@ top::Type ::= d::Decorated StructDecl
 production unionType
 top::Type ::= d::Decorated UnionDecl
 {
-  top.pp = pp"union ${text(d.name)}";
+  top.pp = text(d.name);
   top.mangledName = s"union_${d.name}_";
   top.typeExpr = nameTypeExpr(name(d.name));
   top.isEqualTo = \ other::Type ->

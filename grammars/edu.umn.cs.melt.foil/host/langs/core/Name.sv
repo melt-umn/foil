@@ -1,19 +1,13 @@
 grammar edu:umn:cs:melt:foil:host:langs:core;
 
--- TODO: name should be a common NT shared between all languages
-
-synthesized attribute name::String;
 synthesized attribute lookupValue::ValueItem;
 synthesized attribute lookupType::TypeItem;
 
-tracked nonterminal Name with pp, name, env, lookupValue, lookupType;
+attribute env, lookupValue, lookupType occurs on Name;
 
-production name
+aspect production name
 top::Name ::= id::String
 {
-  top.pp = text(id);
-  top.name = id;
-
   top.lookupValue =
     case lookupValue(id, top.env) of
     | [] -> errorValueItem(id)
@@ -24,9 +18,4 @@ top::Name ::= id::String
     | [] -> errorTypeItem(id)
     | t :: _ -> t
     end;
-}
-
-instance Eq Name {
-  eq = \ a::Name b::Name ->
-    a.name == b.name;
 }

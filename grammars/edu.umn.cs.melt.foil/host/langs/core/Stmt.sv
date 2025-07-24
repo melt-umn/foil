@@ -2,25 +2,29 @@ grammar edu:umn:cs:melt:foil:host:langs:core;
 
 inherited attribute returnType::Maybe<Type>;
 
+synthesized attribute isEmpty::Boolean;
 synthesized attribute hasReturn::Boolean;
 
-tracked nonterminal Stmt with pp, returnType, env, defs, hasReturn, errors;
+tracked nonterminal Stmt with pp, isEmpty, returnType, env, defs, hasReturn, errors;
 propagate returnType, defs, errors on Stmt;
 
 aspect default production
 top::Stmt ::=
 {
+  top.isEmpty = false;
   top.hasReturn = false;
 }
 production emptyStmt
 top::Stmt ::=
 {
+  top.isEmpty = true;
   top.pp = pp"";
 }
 production seq
 top::Stmt ::= s1::Stmt s2::Stmt
 {
   top.pp = pp"${s1}\n${s2}";
+  top.isEmpty = s1.isEmpty && s2.isEmpty;
   s1.env = top.env;
   s2.env = addEnv(s1.defs, s1.env);
 
@@ -61,10 +65,7 @@ production if_
 top::Stmt ::= c::Expr t::Stmt e::Stmt
 {
   top.pp = pp"if (${box(c.pp)}) {${groupnestlines(2, t.pp)}}${
-    case e of
-    | emptyStmt() -> pp""
-    | _ -> braces(groupnestlines(2, e.pp))
-    end}";
+    if e.isEmpty then pp"" else braces(groupnestlines(2, e.pp))}";
   propagate env;
   top.hasReturn = t.hasReturn && e.hasReturn;
   top.errors <-

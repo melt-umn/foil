@@ -2,6 +2,8 @@ grammar edu:umn:cs:melt:foil:host:concretesyntax;
 
 closed tracked nonterminal TypeExpr with ast<ext:TypeExpr>;
 concrete productions top::TypeExpr
+| n::Name
+  { abstract ext:nameTypeExpr; }
 | 'int'
   { abstract ext:intTypeExpr; }
 | 'float'

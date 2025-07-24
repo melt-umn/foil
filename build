@@ -9,8 +9,17 @@ export SILVER_GEN=generated
 # Need to bump up the heap space to run the MWDA:
 export SVJVM_FLAGS="-Xmx6G -Xss25m"
 
+# Build host
 silver -o foil.jar "$@" edu:umn:cs:melt:foil:host
-
 export GRAMMAR_PATH="foil.jar:$GRAMMAR_PATH"
 
+# Build extensions
+silver -o foil-records.jar "$@" edu:umn:cs:melt:foil:extensions:records
+export GRAMMAR_PATH="foil-records.jar:$GRAMMAR_PATH"
+
+# Build composition artifacts
 silver -o composed_host.jar "$@" edu:umn:cs:melt:foil:composed:host
+silver -o composed_records.jar "$@" edu:umn:cs:melt:foil:composed:with_records
+
+# Perform MDA tests
+silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests

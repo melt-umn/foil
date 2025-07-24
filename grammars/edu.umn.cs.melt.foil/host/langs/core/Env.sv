@@ -62,12 +62,11 @@ top::Env ::= e::Env
   top.typeScopes = openScope(e.typeScopes);
 }
 
-synthesized attribute lookupErrors::[Message];
-
-data nonterminal ValueItem with name, type, lookupErrors, isLValue;
+data nonterminal ValueItem with name, type, found, lookupErrors, isLValue;
 aspect default production
 top::ValueItem ::=
 {
+  top.found = true;
   top.lookupErrors = [];
 }
 production varValueItem
@@ -96,14 +95,16 @@ top::ValueItem ::= name::String
 {
   top.name = name;
   top.type = errorType();
+  top.found = false;
   top.lookupErrors = [errFromOrigin(top, s"Undefined value ${name}")];
   top.isLValue = true;
 }
 
-data nonterminal TypeItem with name, type, lookupErrors;
+data nonterminal TypeItem with name, type, found, lookupErrors;
 aspect default production
 top::TypeItem ::=
 {
+  top.found = true;
   top.lookupErrors = [];
 }
 production structTypeItem
@@ -123,6 +124,7 @@ top::TypeItem ::= name::String
 {
   top.name = name;
   top.type = errorType();
+  top.found = false;
   top.lookupErrors = [errFromOrigin(top, s"Undefined type ${name}")];
 }
 

@@ -3,7 +3,7 @@ grammar edu:umn:cs:melt:foil:host:langs:ext;
 imports silver:langutil;
 imports silver:langutil:pp;
 
-imports edu:umn:cs:melt:foil:host:env;
+imports edu:umn:cs:melt:foil:host:common;
 imports edu:umn:cs:melt:foil:host:langs:core as core;
 
 include edu:umn:cs:melt:foil:host:langs:core {
@@ -19,15 +19,13 @@ attribute toCore, liftedDecls occurs on
   VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
-  Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
+  Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 propagate toCore on Root;
 propagate toCore, liftedDecls on
   VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
-  Stmt, Expr, Exprs, FieldExprs, FieldExpr, Name;
-
-flowtype GlobalDecl = decorate {env, declaredEnv}, toCore {decorate}, liftedDecls {decorate};
+  Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 
 aspect toCore on GlobalDecl of
 | appendGlobalDecl(d1, d2) -> core:mkAppendGlobalDecl(@d1.toCore, @d2.toCore)

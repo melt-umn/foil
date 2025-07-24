@@ -22,12 +22,12 @@ top::TypeExpr ::= fs::Fields
   top.pp = pp"record {${ppImplode(pp", ", fs.pps)}}";
   propagate env, errors;
   top.type = recordType(sortByKey(fst, fs.fields));
-  local structName::String = "_" ++ top.type.mangledName;
+  nondecorated local structName::Name = name("_" ++ top.type.mangledName);
   top.liftedDecls = core:mkAppendGlobalDecl(
     coreCondTypeDecl(structName,
-      core:structGlobalDecl(core:structDecl(core:name(structName), @fs.toCore))),
+      core:structGlobalDecl(core:structDecl(structName, @fs.toCore))),
     @fs.liftedDecls);
-  top.toCore = core:nameTypeExpr(core:name(structName));
+  top.toCore = core:nameTypeExpr(structName);
 }
 
 production recordLit
@@ -37,31 +37,32 @@ top::Expr ::= fs::FieldExprs
   top.wrapPP = top.pp;
   propagate env, errors;
   top.type = recordType(sortByKey(fst, fs.fields));
-  local structName::String = "_" ++ top.type.mangledName;
+  nondecorated local structName::Name = name("_" ++ top.type.mangledName);
   top.liftedDecls = core:mkAppendGlobalDecl(
     coreCondTypeDecl(structName,
       core:structGlobalDecl(core:structDecl(
-        core:name(structName),
+        structName,
         foldr(core:consField, core:nilField(),
-          map(\ f::(String, Type) -> core:field(core:name(f.1), coreTypeExpr(f.2.typeExpr)),
+          map(\ f::(String, Type) -> core:field(name(f.1), coreTypeExpr(top.env, f.2.typeExpr)),
             fs.fields))))),
     @fs.liftedDecls);
-  top.toCore = core:structLit(core:name(structName), @fs.toCore);
+  top.toCore = core:structLit(structName, @fs.toCore);
 }
 
 production coreCondTypeDecl
-top::core:GlobalDecl ::= n::String d::core:GlobalDecl
+top::core:GlobalDecl ::= n::Name d::core:GlobalDecl
 {
-  propagate env;
+  top.pp = pp"condTypeDecl ${n} ${d.pp}";
+  propagate core:env;
   forwards to
-    case core:lookupType(n, top.core:declaredEnv) of
-    | [] -> @d
-    | t :: _ -> core:emptyGlobalDecl()
-    end;
+    if n.core:lookupType.found
+    then core:emptyGlobalDecl()
+    else @d;
 }
 
 production coreTypeExpr
-top::core:TypeExpr ::= t::TypeExpr
+top::core:TypeExpr ::= env::Env t::TypeExpr
 {
+  t.env = env;
   forwards to @t.toCore;
 }

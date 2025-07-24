@@ -1,0 +1,16 @@
+
+struct foo {
+  s : string,
+  b : bool
+}
+
+fun main() {
+  var x : record {a : int, b : float, c : string} =
+    record {a=16, b=3.14, c="abcd"};
+  var y : record {a : int, b : float, c : string} = x;
+  x.a = 21;
+  //x.b = 42;
+  var z : foo = foo {s=x.c, b=x != y};
+  var w : record {f : foo*, rs : record {a : int, b : float, c : string}[], z : foo} =
+    record {f=new z, rs = new[] {x, y}, z=z};
+}

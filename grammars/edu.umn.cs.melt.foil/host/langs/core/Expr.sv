@@ -2,8 +2,9 @@ grammar edu:umn:cs:melt:foil:host:langs:core;
 
 synthesized attribute wrapPP::Document;
 synthesized attribute isLValue::Boolean;
+synthesized attribute isConstant::Boolean;
 
-tracked nonterminal Expr with pp, wrapPP, env, isLValue, type, errors;
+tracked nonterminal Expr with pp, wrapPP, env, isLValue, isConstant, type, errors;
 propagate env on Expr excluding let_;
 propagate errors on Expr;
 
@@ -12,6 +13,7 @@ top::Expr ::=
 {
   top.wrapPP = parens(top.pp);
   top.isLValue = false;
+  top.isConstant = false;
 }
 
 production var
@@ -195,16 +197,16 @@ top::FieldExprs ::= f::FieldExpr fs::FieldExprs
     then [errFromOrigin(f, s"Duplicate field '${f.name}' in struct literal")]
     else [];
   
-  fs.expectedFields = filter(\ x::(String, Type) -> x.1 != f.name, fs.expectedFields);
+  fs.expectedFields = filter(\ x::(String, Type) -> x.1 != f.name, top.expectedFields);
   top.structFieldErrors =
-    case lookup(f.name, fs.expectedFields) of
+    case lookup(f.name, top.expectedFields) of
     | just(ty) ->
       if f.type == ty then []
       else [errFromOrigin(f, s"Field '${f.name}' expected type ${show(80, ty)}, but got ${show(80, f.type)}")]
     | nothing() -> [errFromOrigin(f, s"Unexpected field '${f.name}' in struct literal")]
     end ++ fs.structFieldErrors;
   top.unionFieldErrors =
-    case lookup(f.name, fs.expectedFields) of
+    case lookup(f.name, top.expectedFields) of
     | just(ty) ->
       if f.type == ty then []
       else [errFromOrigin(f, s"Field '${f.name}' expected type ${show(80, ty)}, but got ${show(80, f.type)}")]
@@ -266,6 +268,7 @@ top::Expr ::= i::Integer
   top.pp = pp"${i}";
   top.wrapPP = top.pp;
   top.type = intType();
+  top.isConstant = true;
 }
 production floatLit
 top::Expr ::= f::Float
@@ -273,6 +276,7 @@ top::Expr ::= f::Float
   top.pp = pp"${f}";
   top.wrapPP = top.pp;
   top.type = floatType();
+  top.isConstant = true;
 }
 production trueLit
 top::Expr ::=
@@ -280,6 +284,7 @@ top::Expr ::=
   top.pp = pp"true";
   top.wrapPP = top.pp;
   top.type = boolType();
+  top.isConstant = true;
 }
 production falseLit
 top::Expr ::=
@@ -287,6 +292,7 @@ top::Expr ::=
   top.pp = pp"false";
   top.wrapPP = top.pp;
   top.type = boolType();
+  top.isConstant = true;
 }
 production stringLit
 top::Expr ::= s::String
@@ -294,6 +300,7 @@ top::Expr ::= s::String
   top.pp = pp"${s}";
   top.wrapPP = top.pp;
   top.type = stringType();
+  top.isConstant = true;
 }
 production unitLit
 top::Expr ::=
@@ -301,6 +308,7 @@ top::Expr ::=
   top.pp = pp"()";
   top.wrapPP = top.pp;
   top.type = unitType();
+  top.isConstant = true;
 }
 
 -- Operators

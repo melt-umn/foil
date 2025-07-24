@@ -1,6 +1,4 @@
-grammar edu:umn:cs:melt:foil:host:env;
-
-imports silver:util:treemap as tm;
+grammar edu:umn:cs:melt:foil:host:common;
 
 -- TODO: Maybe these utilities belong in silver:langutil:env or something like that?
 
@@ -21,3 +19,6 @@ fun lookupScope [a] ::= n::String  s::Scopes<a> =
   end;
 {-- Looks up an identifier in the innermost scope -}
 fun lookupInLocalScope [a] ::= n::String  s::Scopes<a> = tm:lookup(n, head(s));
+
+synthesized attribute found::Boolean;
+synthesized attribute lookupErrors::[Message];

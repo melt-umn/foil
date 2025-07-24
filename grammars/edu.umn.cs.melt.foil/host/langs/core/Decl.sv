@@ -1,6 +1,8 @@
 grammar edu:umn:cs:melt:foil:host:langs:core;
 
-tracked nonterminal VarDecl with pp, env, name, type, defs, errors;
+synthesized attribute initExpr::Decorated Expr;
+
+tracked nonterminal VarDecl with pp, env, name, type, initExpr, defs, errors;
 propagate env, errors on VarDecl;
 
 production varDecl
@@ -9,6 +11,7 @@ top::VarDecl ::= n::Name t::TypeExpr i::Expr
   top.pp = pp"var ${n} : ${t} = ${i};";
   top.name = n.name;
   top.type = t.type;
+  top.initExpr = i;
   top.defs := valueDefs([varValueItem(top)]);
   top.errors <-
     if t.type == i.type then []

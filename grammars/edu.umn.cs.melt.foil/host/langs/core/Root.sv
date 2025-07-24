@@ -32,6 +32,9 @@ production varGlobalDecl
 top::GlobalDecl ::= d::VarDecl
 {
   top.pp = d.pp;
+  top.errors <-
+    if d.initExpr.isConstant then []
+    else [errFromOrigin(d.initExpr, s"Global var ${d.name} must be initialized with a constant expression")];
 }
 production fnGlobalDecl
 top::GlobalDecl ::= d::FnDecl
@@ -52,7 +55,10 @@ top::GlobalDecl ::= d::UnionDecl
 production mkAppendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {
+  top.pp = pp"${d1}\n${d2}";
   propagate env;
+  d1.declaredEnv = top.declaredEnv;
+  d2.declaredEnv = addEnv(d1.defs, d1.declaredEnv);
   forwards to
     case d1, d2 of
     | emptyGlobalDecl(), _ -> @d2

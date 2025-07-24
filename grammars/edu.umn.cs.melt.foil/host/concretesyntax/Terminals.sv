@@ -67,7 +67,7 @@ ignore terminal Whitespace_t   /[\n\r\t ]+/;
 ignore terminal LineComment_t  /\/\/.*/;
 ignore terminal BlockComment_t /\/\*([^*]|\*\/)*\*\//;
 
-closed tracked nonterminal Name with ast<ext:Name>;
+closed tracked nonterminal Name with ast<com:Name>;
 concrete production name
 top::Name ::= id::Identifier_t
-{ top.ast = ext:name(id.lexeme); }
+{ top.ast = com:name(id.lexeme); }

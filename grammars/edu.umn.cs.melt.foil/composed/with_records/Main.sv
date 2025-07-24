@@ -1,4 +1,4 @@
-grammar edu:umn:cs:melt:foil:composed:host;
+grammar edu:umn:cs:melt:foil:composed:with_records;
 
 imports edu:umn:cs:melt:foil:host:concretesyntax as cnc;
 imports edu:umn:cs:melt:foil:host:langs:ext as ext;
@@ -6,6 +6,7 @@ imports edu:umn:cs:melt:foil:host:driver;
 
 parser foilParser :: cnc:Root {
   edu:umn:cs:melt:foil:host;
+  edu:umn:cs:melt:foil:extensions:records;
 }
 
 fun main IO<Integer> ::= args::[String] = driver(args, foilParser);
