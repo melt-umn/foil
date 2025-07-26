@@ -9,7 +9,7 @@ flowtype decorate {env} on
   Expr, Exprs, FieldExprs, FieldExpr;
 flowtype decorate {env, returnType} on Stmt;
 
-flowtype forward {decorate} on 
+flowtype forward {} on 
   GlobalDecl, Stmt, Expr, TypeExpr;
 flowtype forward {} on 
   Root, VarDecl, FnDecl, Params, Param,
