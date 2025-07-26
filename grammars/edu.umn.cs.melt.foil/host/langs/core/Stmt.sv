@@ -97,8 +97,11 @@ top::Stmt ::= e::Expr
 }
 
 instance Semigroup Stmt {
-  append = seq;
+  append = mkSeq;
 }
 instance Monoid Stmt {
-  mempty = emptyStmt();
+  mempty = mkEmptyStmt;
 }
+
+global mkSeq::(Stmt ::= Stmt Stmt) = seq;
+global mkEmptyStmt::Stmt = emptyStmt();

@@ -149,7 +149,7 @@ top::Expr ::= es::Exprs
 {
   top.pp = pp"new[] {${ppImplode(pp", ", es.pps)}}";
   top.wrapPP = parens(top.pp);
-  local elemType::Type =
+  production elemType::Type =
     case es.types of
     | t :: _ -> t
     | [] -> errorType()

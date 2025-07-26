@@ -61,8 +61,11 @@ top::GlobalDecl ::= d::UnionDecl
 }
 
 instance Semigroup GlobalDecl {
-  append = appendGlobalDecl;
+  append = mkAppendGlobalDecl;
 }
 instance Monoid GlobalDecl {
-  mempty = emptyGlobalDecl();
+  mempty = mkEmptyGlobalDecl;
 }
+
+global mkAppendGlobalDecl::(GlobalDecl ::= GlobalDecl GlobalDecl) = appendGlobalDecl;
+global mkEmptyGlobalDecl::GlobalDecl = emptyGlobalDecl();

@@ -1,15 +1,11 @@
-grammar edu:umn:cs:melt:foil:host:langs:l1;
+grammar edu:umn:cs:melt:foil:host:langs:l2;
 
-flowtype decorate {} on Root;
-flowtype decorate {env, declaredEnv} on GlobalDecl;
-flowtype decorate {env} on 
-  VarDecl, FnDecl, Params, Param,
+flowtype decorate {} on 
+  Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
-  Expr, Exprs, FieldExpr;
-flowtype decorate {env, expectedFields} on FieldExprs;
-flowtype decorate {env, returnType} on Stmt;
-
+  Expr, Exprs, FieldExprs, FieldExpr;
+flowtype decorate {returnType} on Stmt;
 flowtype forward {} on 
   Root, VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field, TypeExprs,
@@ -27,4 +23,3 @@ flowtype errors {decorate} on
   Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field, TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
-flowtype type {decorate} on Expr, TypeExpr;

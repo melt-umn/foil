@@ -4,6 +4,9 @@ imports edu:umn:cs:melt:foil:host:concretesyntax as cnc;
 imports edu:umn:cs:melt:foil:host:langs:ext as ext;
 imports edu:umn:cs:melt:foil:host:langs:core as core;
 imports edu:umn:cs:melt:foil:host:langs:l1 as l1;
+imports edu:umn:cs:melt:foil:host:langs:l2 as l2;
+imports edu:umn:cs:melt:foil:host:passes:toL1;
+imports edu:umn:cs:melt:foil:host:passes:toL2;
 
 imports silver:langutil;
 imports silver:langutil:pp;
@@ -20,11 +23,17 @@ fun driver IO<Integer> ::= args::[String] parse::(ParseResult<cnc:Root> ::= Stri
     println(messagesToString(coreAst.errors));
     exit(4);
   });
-  let l1Ast :: Decorated l1:Root = coreAst.l1:toL1;
+  let l1Ast :: Decorated l1:Root = coreAst.toL1;
   when_(!null(l1Ast.errors), do {
     println("Errors in L1 AST!");
     println(messagesToString(l1Ast.errors));
     exit(5);
+  });
+  let l2Ast :: Decorated l2:Root = l1Ast.toL2;
+  when_(!null(l2Ast.errors), do {
+    println("Errors in L2 AST!");
+    println(messagesToString(l2Ast.errors));
+    exit(6);
   });
   return 0;
 };
