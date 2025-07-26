@@ -13,10 +13,10 @@ include edu:umn:cs:melt:foil:host:langs:core {
 translation pass toCore
   from edu:umn:cs:melt:foil:host:langs:ext
     to edu:umn:cs:melt:foil:host:langs:core
-  excluding appendGlobalDecl, varGlobalDecl, fnGlobalDecl, structGlobalDecl, unionGlobalDecl;
+  excluding varGlobalDecl, fnGlobalDecl, structGlobalDecl, unionGlobalDecl;
 
 monoid translation attribute liftedDecls::core:GlobalDecl
-  with core:emptyGlobalDecl(), core:mkAppendGlobalDecl;
+  with core:emptyGlobalDecl(), core:appendGlobalDecl;
 attribute liftedDecls occurs on
   VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field,
@@ -29,11 +29,10 @@ propagate liftedDecls on
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 
 aspect toCore on GlobalDecl of
-| appendGlobalDecl(d1, d2) -> core:mkAppendGlobalDecl(@d1.toCore, @d2.toCore)
-| varGlobalDecl(d) -> core:mkAppendGlobalDecl(@d.liftedDecls, core:varGlobalDecl(@d.toCore))
-| fnGlobalDecl(d) -> core:mkAppendGlobalDecl(@d.liftedDecls, core:fnGlobalDecl(@d.toCore))
-| structGlobalDecl(d) -> core:mkAppendGlobalDecl(@d.liftedDecls, core:structGlobalDecl(@d.toCore))
-| unionGlobalDecl(d) -> core:mkAppendGlobalDecl(@d.liftedDecls, core:unionGlobalDecl(@d.toCore))
+| varGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:varGlobalDecl(@d.toCore))
+| fnGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:fnGlobalDecl(@d.toCore))
+| structGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:structGlobalDecl(@d.toCore))
+| unionGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:unionGlobalDecl(@d.toCore))
 end;
 
 production fnDeclUnit

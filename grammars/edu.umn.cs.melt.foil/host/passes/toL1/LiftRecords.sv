@@ -5,7 +5,7 @@ top::TypeExpr ::= fs::Fields
 {
   local structName::String = "_" ++ top.type.mangledName;
   top.toL1 = l1:nameTypeExpr(name(structName));
-  top.liftedDecls = l1:mkAppendGlobalDecl(@fs.liftedDecls,
+  top.liftedDecls = l1:appendGlobalDecl(@fs.liftedDecls,
     if null(l1:lookupType(structName, top.liftedDecls.l1:declaredEnv))
     then l1:structGlobalDecl(l1:structDecl(name(structName), @fs.toL1))
     else l1:emptyGlobalDecl());
@@ -15,8 +15,8 @@ top::Expr ::= fs::FieldExprs
 {
   local structName::String = "_" ++ top.type.mangledName;
   top.toL1 = l1:structLit(name(structName), @fs.toL1);
-  top.liftedDecls = l1:mkAppendGlobalDecl(@fs.liftedDecls,
-    l1:mkAppendGlobalDecl(@fs.recordLiftedDecls,
+  top.liftedDecls = l1:appendGlobalDecl(@fs.liftedDecls,
+    l1:appendGlobalDecl(@fs.recordLiftedDecls,
       if null(l1:lookupType(structName, top.liftedDecls.l1:declaredEnv))
       then l1:structGlobalDecl(l1:structDecl(name(structName), @fs.recordStructFields))
       else l1:emptyGlobalDecl()));
@@ -30,7 +30,7 @@ aspect production consFieldExpr
 top::FieldExprs ::= f::FieldExpr fs::FieldExprs
 {
   top.recordStructFields = l1:consField(@f.recordStructField, @fs.recordStructFields);
-  top.recordLiftedDecls = l1:mkAppendGlobalDecl(@f.recordLiftedDecls, @fs.recordLiftedDecls);
+  top.recordLiftedDecls = l1:appendGlobalDecl(@f.recordLiftedDecls, @fs.recordLiftedDecls);
 }
 aspect production nilFieldExpr
 top::FieldExprs ::=

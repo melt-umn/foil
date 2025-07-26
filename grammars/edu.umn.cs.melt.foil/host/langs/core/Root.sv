@@ -26,6 +26,7 @@ production appendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {
   top.pp = pp"${d1}\n${d2}";
+  top.isEmptyGlobalDecl = d1.isEmptyGlobalDecl && d2.isEmptyGlobalDecl;
   d1.declaredEnv = top.declaredEnv;
   d2.declaredEnv = addEnv(d1.defs, d1.declaredEnv);
 }
@@ -59,20 +60,8 @@ top::GlobalDecl ::= d::UnionDecl
   top.pp = d.pp;
 }
 
-production mkAppendGlobalDecl
-top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
-{
-  propagate env;
-  d1.declaredEnv = top.declaredEnv;
-  d2.declaredEnv = addEnv(d1.defs, d1.declaredEnv);
-  forwards to
-    if d1.isEmptyGlobalDecl then @d2
-    else if d2.isEmptyGlobalDecl then @d1
-    else appendGlobalDecl(@d1, @d2);
-}
-
 instance Semigroup GlobalDecl {
-  append = mkAppendGlobalDecl;
+  append = appendGlobalDecl;
 }
 instance Monoid GlobalDecl {
   mempty = emptyGlobalDecl();

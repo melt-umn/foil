@@ -21,6 +21,7 @@ flowtype pp {} on
   Stmt, Expr, FieldExpr;
 flowtype pps {} on 
   Params, Fields, TypeExprs, Exprs, FieldExprs;
+flowtype isEmptyGlobalDecl {} on GlobalDecl;
 flowtype errors {decorate} on 
   Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field, TypeExpr, TypeExprs,
