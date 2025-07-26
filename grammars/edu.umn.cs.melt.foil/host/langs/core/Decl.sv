@@ -8,7 +8,7 @@ propagate env, errors on VarDecl;
 production varDecl
 top::VarDecl ::= n::Name t::TypeExpr i::Expr
 {
-  top.pp = pp"var ${n} : ${t} = ${i};";
+  top.pp = pp"var ${n} : ${t} = ${group(nest(2, cat(line(), i.pp)))}";
   top.name = n.name;
   top.type = t.type;
   top.initExpr = i;
@@ -20,7 +20,7 @@ top::VarDecl ::= n::Name t::TypeExpr i::Expr
 production autoVarDecl
 top::VarDecl ::= n::Name i::Expr
 {
-  top.pp = pp"var ${n} = ${i};";
+  top.pp = pp"var ${n} = ${i}";
   top.name = n.name;
   top.type = i.type;
   top.initExpr = i;
@@ -36,7 +36,7 @@ propagate errors on FnDecl;
 production fnDecl
 top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
 {
-  top.pp = pp"fun ${n}(${ppImplode(pp", ", params.pps)}) -> ${ret} {${groupnestlines(2, body.pp)}";
+  top.pp = pp"fun ${n}(${ppImplode(pp", ", params.pps)}) -> ${ret} {${groupnestlines(2, body.pp)}}";
   top.name = n.name;
   top.paramTypes = params.paramTypes;
   top.retType = ret.type;
