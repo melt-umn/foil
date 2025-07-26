@@ -12,10 +12,16 @@ top::Root ::= d::GlobalDecl
 }
 
 inherited attribute declaredEnv::Env;  -- Env defs declared so far
+synthesized attribute isEmptyGlobalDecl::Boolean;
 
-tracked nonterminal GlobalDecl with pp, env, declaredEnv, defs, errors;
+tracked nonterminal GlobalDecl with pp, isEmptyGlobalDecl, env, declaredEnv, defs, errors;
 propagate env, defs, errors on GlobalDecl;
 
+aspect default production
+top::GlobalDecl ::=
+{
+  top.isEmptyGlobalDecl = false;
+}
 production appendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {
@@ -27,6 +33,7 @@ production emptyGlobalDecl
 top::GlobalDecl ::=
 {
   top.pp = pp"";
+  top.isEmptyGlobalDecl = true;
 }
 production varGlobalDecl
 top::GlobalDecl ::= d::VarDecl
@@ -55,16 +62,13 @@ top::GlobalDecl ::= d::UnionDecl
 production mkAppendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {
-  top.pp = pp"${d1}\n${d2}";
   propagate env;
   d1.declaredEnv = top.declaredEnv;
   d2.declaredEnv = addEnv(d1.defs, d1.declaredEnv);
   forwards to
-    case d1, d2 of
-    | emptyGlobalDecl(), _ -> @d2
-    | _, emptyGlobalDecl() -> @d1
-    | _, _ -> appendGlobalDecl(@d1, @d2)
-    end;
+    if d1.isEmptyGlobalDecl then @d2
+    else if d2.isEmptyGlobalDecl then @d1
+    else appendGlobalDecl(@d1, @d2);
 }
 
 instance Semigroup GlobalDecl {
