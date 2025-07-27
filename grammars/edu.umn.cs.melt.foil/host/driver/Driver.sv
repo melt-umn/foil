@@ -7,11 +7,13 @@ imports edu:umn:cs:melt:foil:host:langs:l1 as l1;
 imports edu:umn:cs:melt:foil:host:langs:l2 as l2;
 imports edu:umn:cs:melt:foil:host:passes:toL1;
 imports edu:umn:cs:melt:foil:host:passes:toL2;
+imports edu:umn:cs:melt:foil:host:passes:ctrans;
 
 imports silver:langutil;
 imports silver:langutil:pp;
 
 fun driver IO<Integer> ::= args::[String] parse::(ParseResult<cnc:Root> ::= String String) = do {
+  let fileName = head(args);
   extAst :: Decorated ext:Root <- parseDriver(args, parse);
   when_(!null(extAst.errors), do {
     println(messagesToString(extAst.errors));
@@ -35,6 +37,9 @@ fun driver IO<Integer> ::= args::[String] parse::(ParseResult<cnc:Root> ::= Stri
     println(messagesToString(l2Ast.errors));
     exit(6);
   });
+  let ctrans :: String = show(80, l2Ast.translation);
+  let outFileName = substitute(".foil", ".c", fileName);
+  writeFile(outFileName, ctrans);
   return 0;
 };
 

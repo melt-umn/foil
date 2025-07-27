@@ -18,7 +18,7 @@ flowtype toL2 {decorate} on
   StructDecl, UnionDecl, Fields, Field, TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 
--- Flatten extra/empty appendGlobalDecl prods
+-- Flatten extra/empty appendGlobalDecl prods from lifting in the prev pass
 aspect production appendGlobalDecl
 top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
 {

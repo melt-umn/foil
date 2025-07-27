@@ -143,7 +143,6 @@ top::Expr ::= size::Expr init::Expr
     if size.type == intType() then []
     else [errFromOrigin(size, s"Array size expected an int, but got ${show(80, size.type)}")];
 }
--- TODO: Could be an extension?
 production arrayLit
 top::Expr ::= es::Exprs
 {

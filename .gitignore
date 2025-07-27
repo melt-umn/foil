@@ -3,3 +3,5 @@ generated/
 *.jar
 build.xml
 *.copperdump.html
+*.c
+*.out

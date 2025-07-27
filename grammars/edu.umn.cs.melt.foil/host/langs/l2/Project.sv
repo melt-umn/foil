@@ -9,7 +9,7 @@ imports edu:umn:cs:melt:foil:host:langs:l1;
 include edu:umn:cs:melt:foil:host:langs:l1 {
   annotate attributes env, type, types, fields, expectedFields;
   exclude nonterminals Defs, Env, ValueItem, TypeItem, Type;
-  exclude attributes defs, declaredEnv, isNumeric, typeExpr, isEqualTo, structFields;
+  exclude attributes defs, declaredEnv, isNumeric, typeExpr, isEqualTo, structFields, elemType;
   exclude productions mkAppendGlobalDecl, mkEmptyGlobalDecl, mkSeq, mkEmptyStmt;
 
   -- Variable declarations are given an explicit type

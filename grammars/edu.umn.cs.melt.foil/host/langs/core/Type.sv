@@ -5,13 +5,15 @@ synthesized attribute typeExpr::TypeExpr;
 synthesized attribute isEqualTo::(Boolean ::= Type);
 synthesized attribute isNumeric::Boolean;
 synthesized attribute structFields::Maybe<[(String, Type)]>;
+synthesized attribute elemType::Type;
 
-tracked data nonterminal Type with pp, mangledName, typeExpr, isEqualTo, isNumeric, structFields;
+tracked data nonterminal Type with pp, mangledName, typeExpr, isEqualTo, isNumeric, structFields, elemType;
 aspect default production
 top::Type ::=
 {
   top.isNumeric = false;
   top.structFields = nothing();
+  top.elemType = errorType();
 }
 production intType
 top::Type ::=
@@ -93,6 +95,7 @@ top::Type ::= t::Type
     | errorType() -> true
     | _ -> false
     end;
+  top.elemType = t;
 }
 production arrayType
 top::Type ::= t::Type
@@ -106,6 +109,7 @@ top::Type ::= t::Type
     | errorType() -> true
     | _ -> false
     end;
+  top.elemType = t;
 }
 production structType
 top::Type ::= d::Decorated StructDecl
