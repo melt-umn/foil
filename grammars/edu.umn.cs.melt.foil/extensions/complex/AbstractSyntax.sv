@@ -22,11 +22,7 @@ top::TypeExpr ::=
   top.type = complexType();
   top.errors := [];
 
-  top.toCore =
-    core:recordTypeExpr(
-      core:consField(core:field(name("real"), core:floatTypeExpr()),
-        core:consField(core:field(name("imag"), core:floatTypeExpr()),
-          core:nilField())));
+  top.toCore = Foil_TypeExpr { {name : float, type : float} };
   propagate liftedDecls;
 }
 
@@ -44,17 +40,10 @@ top::Expr ::= real::Expr imag::Expr
     if imag.type == floatType() then []
     else [errFromOrigin(real, s"Imaginary part must be of type float, got ${show(80, real.type)}")];
   
-  top.toCore = complexLitImpl(@real.toCore, @imag.toCore);
+  top.toCore = Foil_Expr {
+    record { real=$Expr{@real.toCore}, imag=$Expr{@imag.toCore} }
+  };
   propagate liftedDecls;
-}
-production complexLitImpl
-top::core:Expr ::= real::core:Expr imag::core:Expr
-{
-  forwards to
-    core:recordLit(
-      core:consFieldExpr(core:fieldExpr(name("real"), @real),
-        core:consFieldExpr(core:fieldExpr(name("imag"), @imag),
-          core:nilFieldExpr())));
 }
 
 production realPart
@@ -68,7 +57,7 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  top.toCore = core:fieldAccess(@e.toCore, name("real"));
+  top.toCore = Foil_Expr { $Expr{e}.real };
   propagate liftedDecls;
 }
 production imagPart
@@ -82,7 +71,7 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  top.toCore = core:fieldAccess(@e.toCore, name("imag"));
+  top.toCore = Foil_Expr { $Expr{e}.imag };
   propagate liftedDecls;
 }
 production complexConj
@@ -95,11 +84,11 @@ top::Expr ::= e::Expr
   top.errors <-
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
-  
-  top.toCore = core:let_(
-    core:autoVarDecl(name("a"), @e.toCore),
-    complexLitImpl(
-      core:fieldAccess(core:var(name("a")), name("real")),
-      core:negOp(core:fieldAccess(core:var(name("a")), name("imag")))));
+
+  top.toCore = Foil_Expr {
+    let var a = $Expr{@e.toCore}
+    in record { real = a.real, imag = -a.imag }
+    end
+  };
   propagate liftedDecls;
 }

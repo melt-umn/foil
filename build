@@ -13,8 +13,11 @@ export SVJVM_FLAGS="-Xmx6G -Xss25m"
 silver -o foil.jar "$@" edu:umn:cs:melt:foil:host
 export GRAMMAR_PATH="foil.jar:$GRAMMAR_PATH"
 
+# Build extended Silver compiler
+silver -o silver_compiler.jar "$@" edu:umn:cs:melt:foil:composed:silver_compiler
+
 # Build extensions
-silver -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
+silver-custom silver_compiler.jar -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
 export GRAMMAR_PATH="foil-complex.jar:$GRAMMAR_PATH"
 
 # Build compiler

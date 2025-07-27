@@ -1,9 +1,10 @@
 grammar edu:umn:cs:melt:foil:host:concretesyntax;
 
-lexer class Operator;
-lexer class Keyword;
-lexer class Type extends Keyword;
+lexer class Operator extends lsp:Operator;
+lexer class Keyword extends lsp:Keyword;
+lexer class Type extends lsp:Type;
 lexer class Literal;
+lexer class Comment extends lsp:Comment;
 lexer class Reserved;
 
 terminal Or_t          '||' lexer classes {Operator}, precedence = 5, association = left;
@@ -60,13 +61,13 @@ terminal Unit_t         'unit'   lexer classes {Type, Reserved};
 
 terminal Identifier_t    /[a-zA-Z_][a-zA-Z0-9_]*/ submits to Reserved;
 
-terminal IntLit_t       /[0-9]+/          lexer classes {Literal};
-terminal FloatLit_t     /[0-9]+\.[0-9]+/  lexer classes {Literal};
-terminal StringLit_t    /"([^"\\]|\\.)*"/ lexer classes {Literal};
+terminal IntLit_t       /[0-9]+/          lexer classes {Literal, lsp:Number};
+terminal FloatLit_t     /[0-9]+\.[0-9]+/  lexer classes {Literal, lsp:Number};
+terminal StringLit_t    /"([^"\\]|\\.)*"/ lexer classes {Literal, lsp:String_};
 
 ignore terminal Whitespace_t   /[\n\r\t ]+/;
-ignore terminal LineComment_t  /\/\/.*/;
-ignore terminal BlockComment_t /\/\*([^*]|\*\/)*\*\//;
+ignore terminal LineComment_t  /\/\/.*/               lexer classes {Comment};
+ignore terminal BlockComment_t /\/\*([^*]|\*\/)*\*\// lexer classes {Comment};
 
 closed tracked nonterminal Name with ast<com:Name>;
 concrete production name
