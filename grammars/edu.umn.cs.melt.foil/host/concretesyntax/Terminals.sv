@@ -16,6 +16,7 @@ terminal GTEQ_t        '>=' lexer classes {Operator}, precedence = 9, associatio
 terminal LTEQ_t        '<=' lexer classes {Operator}, precedence = 9, association = left;
 terminal EQEQ_t        '==' lexer classes {Operator}, precedence = 9, association = left;
 terminal NEQ_t         '!=' lexer classes {Operator}, precedence = 9, association = left;
+terminal PlusPlus_t    '++' lexer classes {Operator}, precedence = 11, association = left;
 terminal Plus_t        '+'  lexer classes {Operator}, precedence = 11, association = left;
 terminal Minus_t       '-'  lexer classes {Operator}, precedence = 11, association = left;
 terminal Multiply_t    '*'  lexer classes {Operator}, precedence = 12, association = left;
@@ -52,6 +53,9 @@ terminal End_t         'end'    lexer classes {Keyword, Reserved};
 terminal Struct_t      'struct' lexer classes {Keyword, Reserved};
 terminal Union_t       'union'  lexer classes {Keyword, Reserved};
 terminal Record_t      'record' lexer classes {Keyword, Reserved};
+terminal Str_t         'str'    lexer classes {Keyword, Reserved};
+terminal Print_t       'print'  lexer classes {Keyword, Reserved};
+terminal Println_t     'println'lexer classes {Keyword, Reserved};
 
 terminal Int_t          'int'    lexer classes {Type, Reserved};
 terminal Float_t        'float'  lexer classes {Type, Reserved};

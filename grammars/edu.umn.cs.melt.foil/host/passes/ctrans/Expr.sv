@@ -17,7 +17,7 @@ aspect translation on Expr of
 | floatLit(f) -> pp(f)
 | trueLit() -> pp"1"
 | falseLit() -> pp"0"
-| stringLit(s) -> pp"(struct _string){${toString(length(s))}, \"${escapeString(s)}\"}"
+| stringLit(s) -> pp"(struct _string){${text(toString(length(s)))}, ${s}}"
 | unitLit() -> pp"0"
 | cond(c, t, e) -> parens(box(group(pp"${c.translation} ?\n${t.translation} :\n${e.translation}")))
 | negOp(e) -> pp"(-${e.translation})"
@@ -35,10 +35,24 @@ aspect translation on Expr of
 | andOp(lhs, rhs) -> binOpTrans("&&", lhs, rhs)
 | orOp(lhs, rhs) -> binOpTrans("||", lhs, rhs)
 | notOp(e) -> pp"(!${e.translation})"
+| concatOp(lhs, rhs) ->
+  pp"_concat_string(${group(box(pp"${lhs.translation},\n${rhs.translation}"))})"
+| strOp(e) ->
+  case e.type of
+  | l1:intType() -> pp"_str_int(${e.translation})"
+  | l1:floatType() -> pp"_str_float(${e.translation})"
+  | l1:boolType() -> pp"_str_bool(${e.translation})"
+  | l1:stringType() -> e.translation
+  | l1:unitType() -> pp"(struct _string){2, \"()\"}"
+  | _ -> error(s"str is not defined for type ${show(80, e.type)}")
+  end
+| print_(e) -> pp"printf(\"%s\", ${e.translation}.data)"
 end;
 
 fun binOpTrans Document ::= op::String lhs::Decorated Expr rhs::Decorated Expr =
-  parens(box(group(pp"${lhs.translation} ${text(op)}\n${rhs.translation}")));
+  -- TODO: This crashes the pp library:
+  -- parens(group(box(pp"${lhs.translation} ${text(op)}\n${rhs.translation}")));
+  pp"(${lhs.translation} ${text(op)} ${rhs.translation})";
 
 aspect production newPointer
 top::Expr ::= i::Expr

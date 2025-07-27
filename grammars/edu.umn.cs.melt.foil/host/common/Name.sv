@@ -14,3 +14,4 @@ top::Name ::= id::String
   top.name = id;
 }
 
+fun freshName Name ::= = name("_a" ++ toString(genInt()));

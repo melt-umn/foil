@@ -13,6 +13,8 @@ top::Type ::=
     end;
   top.typeExpr = complexTypeExpr();
   top.isNumeric = true;  -- TODO: overloading translation?
+  top.isStrable = true;
+  top.strImpl = complexStrImpl;
 }
 
 production complexTypeExpr
@@ -22,7 +24,7 @@ top::TypeExpr ::=
   top.type = complexType();
   top.errors := [];
 
-  top.toCore = Foil_TypeExpr { {name : float, type : float} };
+  top.toCore = Foil_TypeExpr { {real : float, imag : float} };
   propagate liftedDecls;
 }
 
@@ -57,7 +59,7 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  top.toCore = Foil_Expr { $Expr{e}.real };
+  top.toCore = Foil_Expr { $Expr{@e.toCore}.real };
   propagate liftedDecls;
 }
 production imagPart
@@ -71,7 +73,7 @@ top::Expr ::= e::Expr
     if e.type == complexType() then []
     else [errFromOrigin(e, s"Operand must be of type complex, got ${show(80, e.type)}")];
 
-  top.toCore = Foil_Expr { $Expr{e}.imag };
+  top.toCore = Foil_Expr { $Expr{@e.toCore}.imag };
   propagate liftedDecls;
 }
 production complexConj
@@ -91,4 +93,13 @@ top::Expr ::= e::Expr
     end
   };
   propagate liftedDecls;
+}
+
+production complexStrImpl implements StrImpl
+top::core:Expr ::= e::core:Expr
+{
+  forwards to bindStrImpl(@e, \ a::Name -> Foil_Expr {
+    str($Name{a}.real) ++
+    ($Name{a}.imag >= 0.0? " + " ++ str($Name{a}.imag) : " - " ++ str(-$Name{a}.imag)) ++ "i"
+  });
 }

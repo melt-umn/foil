@@ -4,14 +4,16 @@ synthesized attribute mangledName::String;
 synthesized attribute typeExpr::TypeExpr;
 synthesized attribute isEqualTo::(Boolean ::= Type);
 synthesized attribute isNumeric::Boolean;
+synthesized attribute isStrable::Boolean;
 synthesized attribute structFields::Maybe<[(String, Type)]>;
 synthesized attribute elemType::Type;
 
-tracked data nonterminal Type with pp, mangledName, typeExpr, isEqualTo, isNumeric, structFields, elemType;
+tracked data nonterminal Type with pp, mangledName, typeExpr, isEqualTo, isNumeric, isStrable, structFields, elemType;
 aspect default production
 top::Type ::=
 {
   top.isNumeric = false;
+  top.isStrable = false;
   top.structFields = nothing();
   top.elemType = errorType();
 }
@@ -28,6 +30,7 @@ top::Type ::=
     | _ -> false
     end;
   top.isNumeric = true;
+  top.isStrable = true;
 }
 production floatType
 top::Type ::=
@@ -42,7 +45,7 @@ top::Type ::=
     | _ -> false
     end;
   top.isNumeric = true;
-
+  top.isStrable = true;
 }
 production boolType
 top::Type ::=
@@ -56,6 +59,7 @@ top::Type ::=
     | errorType() -> true
     | _ -> false
     end;
+  top.isStrable = true;
 }
 production stringType
 top::Type ::=
@@ -69,6 +73,7 @@ top::Type ::=
     | errorType() -> true
     | _ -> false
     end;
+  top.isStrable = true;
 }
 production unitType
 top::Type ::=
@@ -82,6 +87,7 @@ top::Type ::=
     | errorType() -> true
     | _ -> false
     end;
+  top.isStrable = true;
 }
 production pointerType
 top::Type ::= t::Type
@@ -96,6 +102,7 @@ top::Type ::= t::Type
     | _ -> false
     end;
   top.elemType = t;
+  top.isStrable = true;
 }
 production arrayType
 top::Type ::= t::Type
@@ -143,7 +150,7 @@ top::Type ::= d::Decorated UnionDecl
 production recordType
 top::Type ::= fs::[(String, Type)]
 {
-  top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)}, ${f.2}", fs))}}";
+  top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)} : ${f.2}", fs))}}";
   top.mangledName = "record_" ++ implode("_", map(\ f::(String, Type) -> f.1 ++ "_" ++ f.2.mangledName, fs)) ++ "_";
   top.typeExpr = nameTypeExpr(name("_" ++ top.mangledName));
   top.isEqualTo = \ other::Type ->
@@ -176,6 +183,7 @@ top::Type ::=
   top.typeExpr = error("type expression shouldn't be used?");
   top.isEqualTo = \ _ -> true;
   top.isNumeric = true;
+  top.isStrable = true;
 }
 
 instance Eq Type {

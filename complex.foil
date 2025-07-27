@@ -1,3 +1,8 @@
 fun main() {
-  var x : float = imag (~ (3.14 +i 42.0));
+  var x = imag (~ (3.14 +i 42.0));
+  var y : complex = x / -2.5 +i 21.0;
+  var z : complex = ~ y;
+  println(x);
+  println(y);
+  println(z);
 }

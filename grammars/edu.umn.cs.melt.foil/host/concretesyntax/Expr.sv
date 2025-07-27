@@ -74,6 +74,11 @@ concrete productions top::Expr
   { abstract ext:orOp; }
 | '!' e::Expr
   { abstract ext:notOp; }
+| e1::Expr '++' e2::Expr
+  { abstract ext:concatOp; }
+
+| 'str' '(' e::Expr ')'
+  { abstract ext:strOp; }
 
 tracked nonterminal Exprs with ast<ext:Exprs>;
 concrete productions top::Exprs

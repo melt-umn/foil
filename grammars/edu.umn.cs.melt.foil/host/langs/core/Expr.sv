@@ -488,3 +488,36 @@ top::Expr ::= e::Expr
     if e.type == boolType() then []
     else [errFromOrigin(e, s"! expected a bool, but got ${show(80, e.type)}")];
 }
+production concatOp
+top::Expr ::= e1::Expr e2::Expr
+{
+  top.pp = pp"${e1.wrapPP} ++ ${e2.wrapPP}";
+  top.type = stringType();
+  top.errors <-
+    if e1.type == stringType() then []
+    else [errFromOrigin(e1, s"++ expected a string, but got ${show(80, e1.type)}")];
+  top.errors <-
+    if e2.type == stringType() then []
+    else [errFromOrigin(e2, s"++ expected a string, but got ${show(80, e2.type)}")];
+}
+production strOp
+top::Expr ::= e::Expr
+{
+  top.pp = pp"str(${e.wrapPP})";
+  top.wrapPP = parens(top.pp);
+  top.type = stringType();
+  top.errors <-
+    if e.type.isStrable then []
+    else [errFromOrigin(e, s"str expected a stringifyable type, but got ${show(80, e.type)}")];
+}
+
+production print_
+top::Expr ::= e::Expr
+{
+  top.pp = pp"print(${e.wrapPP})";
+  top.wrapPP = top.pp;
+  top.type = unitType();
+  top.errors <-
+    if e.type == stringType() then []
+    else [errFromOrigin(e, s"print expected a string, but got ${show(80, e.type)}")];
+}

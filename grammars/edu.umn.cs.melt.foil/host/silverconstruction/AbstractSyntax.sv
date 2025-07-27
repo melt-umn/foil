@@ -7,7 +7,7 @@ top::silver:Expr ::= ast::ext:GlobalDecl
   top.unparse = s"Foil_GlobalDecl {${concat(explode("\n", show(80, ast.pp)))}}";
   ast.ext:env = ext:emptyEnv();
   ast.ext:declaredEnv = ext:emptyEnv();
-  forwards to translate(reflect(^ast.ext:toCore));
+  forwards to translate(reflect(^ast.directToCore));
 }
 
 production quoteTypeExpr
@@ -15,7 +15,7 @@ top::silver:Expr ::= ast::ext:TypeExpr
 {
   top.unparse = s"Foil_TypeExpr {${concat(explode("\n", show(80, ast.pp)))}}";
   ast.ext:env = ext:emptyEnv();
-  forwards to translate(reflect(^ast.ext:toCore));
+  forwards to translate(reflect(^ast.directToCore));
 }
 
 production quoteStmt
@@ -24,7 +24,7 @@ top::silver:Expr ::= ast::ext:Stmt
   top.unparse = s"Foil_Stmt {${concat(explode("\n", show(80, ast.pp)))}}";
   ast.ext:env = ext:emptyEnv();
   ast.ext:returnType = nothing();
-  forwards to translate(reflect(^ast.ext:toCore));
+  forwards to translate(reflect(^ast.directToCore));
 }
 
 production quoteExpr
@@ -32,7 +32,7 @@ top::silver:Expr ::= ast::ext:Expr
 {
   top.unparse = s"Foil_Expr {${concat(explode("\n", show(80, ast.pp)))}}";
   ast.ext:env = ext:emptyEnv();
-  forwards to translate(reflect(^ast.ext:toCore));
+  forwards to translate(reflect(^ast.directToCore));
 }
 
 -- Foil-to-Silver bridge productions
@@ -40,7 +40,8 @@ production antiquoteExtTypeExpr
 top::ext:TypeExpr ::= e::silver:Expr
 {
   top.pp = pp"$$TypeExpr{${text(e.unparse)}}";
-  top.ext:toCore = antiquoteTypeExpr(^e);
+  top.directToCore = antiquoteTypeExpr(^e);
+  top.ext:toCore = error("Should not be demanded");
   top.ext:liftedDecls = error("Should not be demanded");
   top.errors := error("Should not be demanded");
   top.ext:type = error("Should not be demanded");
@@ -56,9 +57,10 @@ production antiquoteExtStmt
 top::ext:Stmt ::= e::silver:Expr
 {
   top.pp = pp"$$Stmt{${text(e.unparse)}}";
-  top.ext:toCore = antiquoteStmt(^e);
+  top.directToCore = antiquoteStmt(^e);
+  top.ext:toCore = error("Should not be demanded");
   top.ext:liftedDecls = error("Should not be demanded");
-  top.ext:defs := mempty;
+  top.ext:defs := error("Should not be demanded");
   top.errors := error("Should not be demanded");
 }
 production antiquoteStmt
@@ -72,7 +74,8 @@ production antiquoteExtExpr
 top::ext:Expr ::= e::silver:Expr
 {
   top.pp = pp"$$Expr{${text(e.unparse)}}";
-  top.ext:toCore = antiquoteExpr(^e);
+  top.directToCore = antiquoteExpr(^e);
+  top.ext:toCore = error("Should not be demanded");
   top.ext:liftedDecls = error("Should not be demanded");
   top.errors := error("Should not be demanded");
   top.ext:type = error("Should not be demanded");

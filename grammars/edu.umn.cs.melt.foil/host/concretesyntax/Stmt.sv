@@ -29,3 +29,7 @@ concrete productions top::Stmt
   { abstract ext:return_; }
 | 'return' ';'
   { abstract ext:returnUnit; }
+| 'print' e::Expr ';'
+  { abstract ext:printStmt; }
+| 'println' e::Expr ';'
+  { abstract ext:printlnStmt; }

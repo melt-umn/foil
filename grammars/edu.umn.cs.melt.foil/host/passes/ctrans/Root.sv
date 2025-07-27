@@ -17,6 +17,36 @@ top::Root ::= d::GlobalDecl
 #include <gc.h>
 
 struct _string { size_t length; char* data; };
+static inline struct _string _concat_string(struct _string s1, struct _string s2) {
+  if (s1.length == 0) return s2;
+  if (s2.length == 0) return s1;
+  struct _string result;
+  result.length = s1.length + s2.length;
+  result.data = (char*)GC_MALLOC(result.length + 1);
+  memcpy(result.data, s1.data, s1.length);
+  memcpy(result.data + s1.length, s2.data, s2.length);
+  result.data[result.length] = '\0';
+  return result;
+}
+static inline struct _string _str_int(int i) {
+  struct _string result;
+  result.data = GC_malloc(snprintf(NULL, 0, "%d", i) + 1);
+  result.length = sprintf(result.data, "%d", i);
+  return result;
+}
+static inline struct _string _str_float(float f) {
+  struct _string result;
+  result.data = GC_malloc(snprintf(NULL, 0, "%g", f) + 1);
+  result.length = sprintf(result.data, "%g", f);
+  return result;
+}
+static inline struct _string _str_bool(_Bool b) {
+  if (b) {
+    return (struct _string){5, "true"};
+  } else {
+    return (struct _string){6, "false"};
+  }
+}
 """;
 }
 

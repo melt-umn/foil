@@ -40,13 +40,13 @@ top::Param ::= n::Name t::TypeExpr
 aspect production structDecl
 top::StructDecl ::= n::Name fs::Fields
 {
-  top.protoDecls := pp"typedef struct ${n} ${n};";
+  top.protoDecls := pp"typedef struct ${n} ${n};\n";
   top.translation = pp"struct ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};\n";
 }
 aspect production unionDecl
 top::UnionDecl ::= n::Name fs::Fields
 {
-  top.protoDecls := pp"typedef struct ${n} ${n};";
+  top.protoDecls := pp"typedef union ${n} ${n};\n";
   top.translation = pp"union ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};\n";
 }
 
