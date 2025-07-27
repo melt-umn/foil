@@ -3,39 +3,42 @@ grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 attribute translation occurs on Expr;
 aspect translation on Expr of
 | var(n) -> n.pp
-| let_(d, e) -> pp"({${d.translation} ${e.translation};})"
-| call(f, args) -> pp"${f.pp}(${ppImplode(pp", ", args.translations)})"
+| let_(d, e) -> pp"({${box(pp"${d.varDeclTrans}\n${e.translation};")}})"
+| call(f, args) -> pp"${f.pp}(${group(box(ppImplode(pp",\n", args.translations)))})"
 | deref(e) -> pp"(*${e.translation})"
 | arraySubscript(e, idx) -> pp"${e.translation}[${idx.translation}]"
 | newPointer(e) ->
-  pp"({${elemTy.baseTypePP} ${elemTy.declaratorPP} = GC_malloc(sizeof(${elemTy.baseTypePP} ${elemTy.typeModifierPP}; *_ptr = ${e.translation}; _ptr;})"
+  pp"({${group(box(pp"${elemTy.baseTypePP} ${elemTy.declaratorPP} = GC_malloc(sizeof(${elemTy.baseTypePP} ${elemTy.typeModifierPP}));\n*_ptr = ${e.translation};\n_ptr;"))}})"
 | newArray(s, i) -> error("TODO: arrays")
 | arrayLit(_) -> error("TODO: array literals")
-| structLit(n, fs) -> pp"(${n}){${ppImplode(pp", ", fs.translations)}}"
+| structLit(n, fs) -> pp"(${n}){${groupnestlines(2, ppImplode(pp",\n", fs.translations))}}"
 | fieldAccess(e, f) -> pp"${e.translation}.${f}"
 | intLit(i) -> pp(i)
 | floatLit(f) -> pp(f)
 | trueLit() -> pp"1"
 | falseLit() -> pp"0"
-| stringLit(s) -> pp"\"${escapeString(s)}\""
+| stringLit(s) -> pp"(struct _string){${toString(length(s))}, \"${escapeString(s)}\"}"
 | unitLit() -> pp"0"
-| cond(c, t, e) -> pp"(${c.translation} ? ${t.translation} : ${e.translation})"
+| cond(c, t, e) -> parens(box(group(pp"${c.translation} ?\n${t.translation} :\n${e.translation}")))
 | negOp(e) -> pp"(-${e.translation})"
-| addOp(lhs, rhs) -> pp"(${lhs.translation} + ${rhs.translation})"
-| subOp(lhs, rhs) -> pp"(${lhs.translation} - ${rhs.translation})"
-| mulOp(lhs, rhs) -> pp"(${lhs.translation} * ${rhs.translation})"
-| divOp(lhs, rhs) -> pp"(${lhs.translation} / ${rhs.translation})"
-| modOp(lhs, rhs) -> pp"(${lhs.translation} % ${rhs.translation})"
-| eqOp(lhs, rhs) -> pp"(${lhs.translation} == ${rhs.translation})"
-| neqOp(lhs, rhs) -> pp"(${lhs.translation} != ${rhs.translation})"
-| ltOp(lhs, rhs) -> pp"(${lhs.translation} < ${rhs.translation})"
-| lteOp(lhs, rhs) -> pp"(${lhs.translation} <= ${rhs.translation})"
-| gtOp(lhs, rhs) -> pp"(${lhs.translation} > ${rhs.translation})"
-| gteOp(lhs, rhs) -> pp"(${lhs.translation} >= ${rhs.translation})"
-| andOp(lhs, rhs) -> pp"(${lhs.translation} && ${rhs.translation})"
-| orOp(lhs, rhs) -> pp"(${lhs.translation} || ${rhs.translation})"
+| addOp(lhs, rhs) -> binOpTrans("+", lhs, rhs)
+| subOp(lhs, rhs) -> binOpTrans("-", lhs, rhs)
+| mulOp(lhs, rhs) -> binOpTrans("*", lhs, rhs)
+| divOp(lhs, rhs) -> binOpTrans("/", lhs, rhs)
+| modOp(lhs, rhs) -> binOpTrans("%", lhs, rhs)
+| eqOp(lhs, rhs) -> binOpTrans("==", lhs, rhs)
+| neqOp(lhs, rhs) -> binOpTrans("!=", lhs, rhs)
+| ltOp(lhs, rhs) -> binOpTrans("<", lhs, rhs)
+| lteOp(lhs, rhs) -> binOpTrans("<=", lhs, rhs)
+| gtOp(lhs, rhs) -> binOpTrans(">", lhs, rhs)
+| gteOp(lhs, rhs) -> binOpTrans(">=", lhs, rhs)
+| andOp(lhs, rhs) -> binOpTrans("&&", lhs, rhs)
+| orOp(lhs, rhs) -> binOpTrans("||", lhs, rhs)
 | notOp(e) -> pp"(!${e.translation})"
 end;
+
+fun binOpTrans Document ::= op::String lhs::Decorated Expr rhs::Decorated Expr =
+  parens(box(group(pp"${lhs.translation} ${text(op)}\n${rhs.translation}")));
 
 aspect production newPointer
 top::Expr ::= i::Expr

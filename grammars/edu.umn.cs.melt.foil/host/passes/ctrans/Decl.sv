@@ -1,15 +1,16 @@
 grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 
-attribute translation occurs on VarDecl, FnDecl, Param, StructDecl, UnionDecl, Field;
+synthesized attribute varDeclTrans::Document occurs on VarDecl;
+attribute translation occurs on FnDecl, Param, StructDecl, UnionDecl, Field;
 attribute translations occurs on Params, Fields;
 attribute protoDecls occurs on VarDecl, FnDecl, StructDecl, UnionDecl;
 
 aspect production varDecl
 top::VarDecl ::= n::Name t::TypeExpr i::Expr
 {
-  top.translation = pp"${t.baseTypePP} ${t.declaratorPP} = ${i.translation};";
+  top.varDeclTrans = pp"${t.baseTypePP} ${t.declaratorPP} =${group(nest(2, cat(line(), i.translation)))};";
   t.declName = ^n;
-  top.protoDecls := top.translation;
+  top.protoDecls := cat(top.varDeclTrans, line());
 }
 
 aspect production fnDecl

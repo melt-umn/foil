@@ -2,9 +2,24 @@ grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 
 attribute translation occurs on Root, GlobalDecl;
 
-aspect translation on Root of
-| root(d) -> cat(d.protoDecls, d.translation)
-end;
+aspect production root
+top::Root ::= d::GlobalDecl
+{
+  production attribute preDecls::Document with cat;
+  preDecls := pp"";
+
+  top.translation = pp"${preDecls}\n${d.protoDecls}\n${d.translation}";
+
+  preDecls <- pp"""
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <gc.h>
+
+struct _string { size_t length; char* data; };
+""";
+}
+
 
 aspect translation on GlobalDecl of
 | appendGlobalDecl(d1, d2) -> cat(d1.translation, d2.translation)

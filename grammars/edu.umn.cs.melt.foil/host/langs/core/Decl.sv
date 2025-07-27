@@ -8,7 +8,7 @@ propagate env, errors on VarDecl;
 production varDecl
 top::VarDecl ::= n::Name t::TypeExpr i::Expr
 {
-  top.pp = pp"var ${n} : ${t} = ${group(nest(2, cat(line(), i.pp)))}";
+  top.pp = pp"var ${n} : ${t} = ${groupnest(2, cat(line(), i.pp))}";
   top.name = n.name;
   top.type = t.type;
   top.initExpr = i;

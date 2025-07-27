@@ -50,9 +50,9 @@ top::TypeExpr ::=
 aspect production stringTypeExpr
 top::TypeExpr ::=
 {
-  top.baseTypePP = pp"char";
-  top.typeModifierPP = pp"*";
-  top.declaratorPP = pp"*${top.declName}";
+  top.baseTypePP = pp"struct _string";
+  top.typeModifierPP = pp"";
+  top.declaratorPP = pp"${top.declName}";
 }
 aspect production unitTypeExpr
 top::TypeExpr ::=
