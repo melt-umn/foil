@@ -65,7 +65,7 @@ production if_
 top::Stmt ::= c::Expr t::Stmt e::Stmt
 {
   top.pp = pp"if (${box(c.pp)}) {${groupnestlines(2, t.pp)}}${
-    if e.isEmpty then pp"" else braces(groupnestlines(2, e.pp))}";
+    if e.isEmpty then pp"" else pp" else {${groupnestlines(2, e.pp)}}"}";
   propagate env;
   top.hasReturn = t.hasReturn && e.hasReturn;
   top.errors <-

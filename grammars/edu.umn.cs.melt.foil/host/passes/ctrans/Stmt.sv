@@ -3,7 +3,7 @@ grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 attribute translation occurs on Stmt;
 aspect translation on Stmt of
 | emptyStmt() -> pp""
-| seq(s1, s2) -> pp"${s1.translation}\n${s2.translation}"
+| seq(s1, s2) -> pp"${s1.translation}${line()}${s2.translation}"
 | block(s) -> braces(groupnestlines(2, s.translation))
 | decl(d) -> d.varDeclTrans
 | expr(e) -> pp"${e.translation};"

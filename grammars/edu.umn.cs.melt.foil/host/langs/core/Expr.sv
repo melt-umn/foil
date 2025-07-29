@@ -38,18 +38,13 @@ production call
 top::Expr ::= f::Expr a::Exprs
 {
   top.pp = pp"${f.wrapPP}(${ppImplode(pp", ", a.pps)})";
-  top.type =
-    case f.type of
-    | fnType(_, ret) -> ret
-    | _ -> errorType()
-    end;
-  a.expectedTypes =
-    case f.type of
-    | fnType(params, _) -> params
-    | _ -> []
-    end;
+  top.type = f.type.retType;
+  a.expectedTypes = f.type.paramTypes;
   a.position = 1;
-  top.errors <- a.callErrors;
+  top.errors <-
+    if f.type.isCallable
+    then a.callErrors
+    else [errFromOrigin(f, s"Expression of type ${show(80, f.type)} is not callable")];
 }
 
 inherited attribute expectedTypes::[Type];
@@ -86,12 +81,31 @@ top::Exprs ::=
     if null(top.expectedTypes) then []
     else [errFromOrigin(top, "Too few arguments to function")];
 }
+production appendExprs
+top::Exprs ::= es1::Exprs es2::Exprs
+{
+  es2.env = top.env;
+  forwards to
+    case es1 of
+    | consExpr(h, t) -> consExpr(^h, appendExprs(^t, @es2))
+    | nilExpr() -> @es2
+    end;
+}
 
+production cast
+top::Expr ::= e::Expr t::TypeExpr
+{
+  top.pp = pp"cast (${e} : ${t})";
+  top.wrapPP = top.pp;
+  top.type = t.type;
+  top.errors <-
+    if e.type.isCastableTo(t.type) then []
+    else [errFromOrigin(e, s"Cannot cast ${show(80, e.type)} to ${show(80, t.type)}")];
+}
 production deref
 top::Expr ::= e::Expr
 {
   top.pp = pp"*${e.wrapPP}";
-  top.wrapPP = parens(top.pp);
   top.isLValue = true;
   top.type =
     case e.type of
@@ -109,7 +123,6 @@ production arraySubscript
 top::Expr ::= e::Expr i::Expr
 {
   top.pp = pp"${e.wrapPP}[${i.wrapPP}]";
-  top.wrapPP = parens(top.pp);
   top.isLValue = true;
   top.type =
     case e.type of
@@ -130,7 +143,6 @@ production newPointer
 top::Expr ::= init::Expr
 {
   top.pp = pp"new ${init.wrapPP}";
-  top.wrapPP = parens(top.pp);
   top.type = pointerType(init.type);
 }
 production newArray
@@ -147,7 +159,6 @@ production arrayLit
 top::Expr ::= es::Exprs
 {
   top.pp = pp"new[] {${ppImplode(pp", ", es.pps)}}";
-  top.wrapPP = parens(top.pp);
   production elemType::Type =
     case es.types of
     | t :: _ -> t
@@ -322,7 +333,6 @@ production cond
 top::Expr ::= c::Expr t::Expr e::Expr
 {
   top.pp = pp"${c}? ${t} : ${e}";
-  top.wrapPP = parens(top.pp);
   top.type =
     if t.type == e.type then t.type
     else errorType();
@@ -504,13 +514,12 @@ production strOp
 top::Expr ::= e::Expr
 {
   top.pp = pp"str(${e.wrapPP})";
-  top.wrapPP = parens(top.pp);
+  top.wrapPP = top.pp;
   top.type = stringType();
   top.errors <-
     if e.type.isStrable then []
     else [errFromOrigin(e, s"str expected a stringifyable type, but got ${show(80, e.type)}")];
 }
-
 production print_
 top::Expr ::= e::Expr
 {

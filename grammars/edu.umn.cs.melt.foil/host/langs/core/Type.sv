@@ -4,16 +4,24 @@ synthesized attribute mangledName::String;
 synthesized attribute typeExpr::TypeExpr;
 synthesized attribute isEqualTo::(Boolean ::= Type);
 synthesized attribute isNumeric::Boolean;
+synthesized attribute isCallable::Boolean;
 synthesized attribute isStrable::Boolean;
+synthesized attribute isCastableTo::(Boolean ::= Type);
 synthesized attribute structFields::Maybe<[(String, Type)]>;
 synthesized attribute elemType::Type;
 
-tracked data nonterminal Type with pp, mangledName, typeExpr, isEqualTo, isNumeric, isStrable, structFields, elemType;
+tracked data nonterminal Type with
+  pp, mangledName, typeExpr, isEqualTo, isNumeric, isCallable, paramTypes, retType, 
+  isStrable, isCastableTo, structFields, elemType;
 aspect default production
 top::Type ::=
 {
   top.isNumeric = false;
+  top.isCallable = false;
+  top.paramTypes = [];
+  top.retType = errorType();
   top.isStrable = false;
+  top.isCastableTo = \ other::Type -> other == top || other == errorType();
   top.structFields = nothing();
   top.elemType = errorType();
 }
@@ -89,12 +97,39 @@ top::Type ::=
     end;
   top.isStrable = true;
 }
+production anyPointerType
+top::Type ::=
+{
+  top.pp = pp"any*";
+  top.mangledName = s"anyptr";
+  top.typeExpr = anyPointerTypeExpr();
+  top.isCastableTo = \ other::Type ->
+    case other of
+    | anyPointerType() -> true
+    | pointerType(_) -> true
+    | errorType() -> true
+    | _ -> false
+    end;
+  top.isEqualTo = \ other::Type ->
+    case other of
+    | anyPointerType() -> true
+    | errorType() -> true
+    | _ -> false
+    end;
+}
 production pointerType
 top::Type ::= t::Type
 {
   top.pp = pp"${t.pp}*";
   top.mangledName = s"ptr_${t.mangledName}_";
   top.typeExpr = pointerTypeExpr(t.typeExpr);
+  top.isCastableTo = \ other::Type ->
+    case other of
+    | anyPointerType() -> true
+    | pointerType(ot) -> t == ot
+    | errorType() -> true
+    | _ -> false
+    end;
   top.isEqualTo = \ other::Type ->
     case other of
     | pointerType(otherT) -> t == otherT
@@ -152,7 +187,8 @@ top::Type ::= fs::[(String, Type)]
 {
   top.pp = pp"{${ppImplode(pp", ", map(\ f::(String, Type) -> pp"${text(f.1)} : ${f.2}", fs))}}";
   top.mangledName = "record_" ++ implode("_", map(\ f::(String, Type) -> f.1 ++ "_" ++ f.2.mangledName, fs)) ++ "_";
-  top.typeExpr = nameTypeExpr(name("_" ++ top.mangledName));
+  top.typeExpr = recordTypeExpr(foldr(consField, nilField(),
+    map(\ f::(String, Type) -> field(name(f.1), f.2.typeExpr), fs)));
   top.isEqualTo = \ other::Type ->
     case other of
     | recordType(otherFs) -> fs == otherFs
@@ -162,27 +198,31 @@ top::Type ::= fs::[(String, Type)]
   top.structFields = just(fs);
 }
 production fnType
-top::Type ::= args::[Type] ret::Type
+top::Type ::= params::[Type] ret::Type
 {
-  top.pp = pp"(${ppImplode(pp", ", map((.pp), args))}) -> ${ret}";
-  top.mangledName = s"fn_${implode("_", map((.mangledName), args))}_${ret.mangledName}_";
-  top.typeExpr = fnTypeExpr(foldr(consTypeExpr, nilTypeExpr(), map((.typeExpr), args)), ret.typeExpr);
+  top.pp = pp"(${ppImplode(pp", ", map((.pp), params))}) -> ${ret}";
+  top.mangledName = s"fn_${implode("_", map((.mangledName), params))}_${ret.mangledName}_";
+  top.typeExpr = fnTypeExpr(foldr(consTypeExpr, nilTypeExpr(), map((.typeExpr), params)), ret.typeExpr);
   top.isEqualTo = \ other::Type ->
     case other of
-    | fnType(otherArgs, otherRet) ->
-        args == otherArgs && ret == otherRet
+    | fnType(otherParams, otherRet) ->
+        params == otherParams && ret == otherRet
     | errorType() -> true
     | _ -> false
     end;
+  top.isCallable = true;
+  top.paramTypes = params;
+  top.retType = ret;
 }
 production errorType
 top::Type ::=
 {
   top.pp = pp"err";
   top.mangledName = "err";
-  top.typeExpr = error("type expression shouldn't be used?");
+  top.typeExpr = errorTypeExpr();
   top.isEqualTo = \ _ -> true;
   top.isNumeric = true;
+  top.isCallable = true;
   top.isStrable = true;
 }
 

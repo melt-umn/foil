@@ -2,7 +2,7 @@ grammar edu:umn:cs:melt:foil:host:langs:ext;
 
 flowtype decorate {} on Root;
 flowtype decorate {env, declaredEnv} on GlobalDecl;
-flowtype decorate {env} on 
+flowtype decorate {env} on
   VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field,
   TypeExpr, TypeExprs,
@@ -29,11 +29,12 @@ flowtype errors {decorate} on
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 flowtype type {decorate} on Expr, TypeExpr;
 
-flowtype toCore {decorate} on
-  Root, GlobalDecl, VarDecl, FnDecl, Params, Param,
+flowtype toCore {decorate, toCore.decorate} on Root, GlobalDecl;
+flowtype toCore {decorate, toCore.decorate, liftedDecls.decorate} on
+  VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field, TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
-flowtype liftedDecls {decorate} on
+flowtype liftedDecls {decorate, toCore.decorate, liftedDecls.decorate} on
   VarDecl, FnDecl, Params, Param,
   StructDecl, UnionDecl, Fields, Field, TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;

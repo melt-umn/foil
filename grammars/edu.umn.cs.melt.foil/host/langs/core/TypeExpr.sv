@@ -42,6 +42,12 @@ top::TypeExpr ::=
   top.pp = pp"unit";
   top.type = unitType();
 }
+production anyPointerTypeExpr
+top::TypeExpr ::=
+{
+  top.pp = pp"any *";
+  top.type = anyPointerType();
+}
 production pointerTypeExpr
 top::TypeExpr ::= t::TypeExpr
 {
@@ -65,6 +71,13 @@ top::TypeExpr ::= args::TypeExprs ret::TypeExpr
 {
   top.pp = pp"(${ppImplode(pp", ", args.pps)}) -> ${ret.pp}";
   top.type = fnType(args.types, ret.type);
+}
+production errorTypeExpr
+top::TypeExpr ::=
+{
+  top.pp = pp"error";
+  top.type = errorType();
+  top.errors <- [errFromOrigin(top, "Internal error: encountered errorTypeExpr")];
 }
 
 synthesized attribute types::[Type];

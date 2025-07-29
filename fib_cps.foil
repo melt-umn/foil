@@ -1,0 +1,19 @@
+
+fun fib_cps(n : int, k : closure (int, int) -> int) -> closure (int, int) -> int {
+  if (n <= 1)
+    return k;
+  else
+    return fib_cps(n - 1, lambda (prev : int, n : int) => k(n, prev + n));
+}
+
+fun fib(n : int) -> int {
+  return fib_cps(n, lambda (prev : int, n : int) => n)(0, 1);
+}
+
+fun main() {
+  var i : int = 1;
+  while (i <= 20) {
+    println(str(i) ++ ": " ++ str(fib(i)));
+    i = i + 1;
+  }
+}

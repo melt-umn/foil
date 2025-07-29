@@ -68,6 +68,15 @@ top::Params ::=
   top.pps = [];
   top.paramTypes = [];
 }
+production appendParams
+top::Params ::= ps1::Params ps2::Params
+{
+  forwards to
+    case ps1 of
+    | consParam(h, t) -> consParam(^h, appendParams(^t, @ps2))
+    | nilParam() -> @ps2
+    end;
+}
 
 tracked nonterminal Param with pp, env, name, type, defs, errors;
 propagate env, errors on Param;

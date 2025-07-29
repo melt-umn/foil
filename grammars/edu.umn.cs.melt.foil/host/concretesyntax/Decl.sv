@@ -37,7 +37,7 @@ concrete productions top::FnDecl
 | 'fun' n::Name '(' ps::Params ')' '{' body::StmtList '}'
   { abstract ext:fnDeclUnit; }
 
-tracked nonterminal Params with ast<ext:Params>;
+closed tracked nonterminal Params with ast<ext:Params>;
 concrete productions top::Params
 | p::Param ',' ps::Params
   { abstract ext:consParam; }

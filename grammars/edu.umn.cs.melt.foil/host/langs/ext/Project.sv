@@ -7,13 +7,15 @@ imports edu:umn:cs:melt:foil:host:common;
 imports edu:umn:cs:melt:foil:host:langs:core as core;
 
 include edu:umn:cs:melt:foil:host:langs:core {
-  close nonterminals GlobalDecl, Stmt, Expr, TypeExpr, Type;
+  close nonterminals GlobalDecl, Stmt, Expr, TypeExpr, Type, Param;
 }
 
 translation pass toCore
   from edu:umn:cs:melt:foil:host:langs:ext
     to edu:umn:cs:melt:foil:host:langs:core
-  excluding varGlobalDecl, fnGlobalDecl, structGlobalDecl, unionGlobalDecl, strOp;
+  excluding
+    varGlobalDecl, fnGlobalDecl, structGlobalDecl, unionGlobalDecl,
+    call, strOp;
 
 monoid translation attribute liftedDecls::core:GlobalDecl
   with core:emptyGlobalDecl(), core:appendGlobalDecl;

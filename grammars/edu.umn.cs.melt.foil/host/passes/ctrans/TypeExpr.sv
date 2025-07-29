@@ -61,6 +61,13 @@ top::TypeExpr ::=
   top.typeModifierPP = pp"";
   top.declaratorPP = top.declName.pp;
 }
+aspect production anyPointerTypeExpr
+top::TypeExpr ::=
+{
+  top.baseTypePP = pp"void";
+  top.typeModifierPP = pp"*";
+  top.declaratorPP = pp"*${top.declName}";
+}
 aspect production pointerTypeExpr
 top::TypeExpr ::= t::TypeExpr
 {
@@ -80,7 +87,7 @@ aspect production fnTypeExpr
 top::TypeExpr ::= args::TypeExprs ret::TypeExpr
 {
   top.baseTypePP = ret.baseTypePP;
-  top.typeModifierPP = pp"(*${ret.typeModifierPP})(${ppImplode(pp", ", args.pps)})";
-  top.declaratorPP = pp"(*${ret.declaratorPP})(${ppImplode(pp", ", args.pps)})";
+  top.typeModifierPP = pp"(*${ret.typeModifierPP})(${ppImplode(pp", ", args.translations)})";
+  top.declaratorPP = pp"(*${ret.declaratorPP})(${ppImplode(pp", ", args.translations)})";
   ret.declName = top.declName;
 }

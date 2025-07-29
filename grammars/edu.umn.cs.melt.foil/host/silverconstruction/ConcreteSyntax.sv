@@ -16,10 +16,20 @@ concrete productions top::silver:Expr
   { forwards to quoteExpr(cst.ast); }
 
 -- Foil-to-Silver bridge productions
+concrete productions top::foil:GlobalDecl
+| '$GlobalDecl' '{' e::silver:Expr '}'
+  layout {silver:WhiteSpace}
+  { top.ast = antiquoteExtGlobalDecl(^e); }
+
 concrete productions top::foil:TypeExpr
 | '$TypeExpr' '{' e::silver:Expr '}'
   layout {silver:WhiteSpace}
   { top.ast = antiquoteExtTypeExpr(^e); }
+
+concrete productions top::foil:Param
+| '$Params' '{' e::silver:Expr '}'
+  layout {silver:WhiteSpace}
+  { top.ast = antiquoteExtParams(^e); }
 
 concrete productions top::foil:Stmt
 | '$Stmt' '{' e::silver:Expr '}'
@@ -30,6 +40,9 @@ concrete productions top::foil:Expr
 | '$Expr' '{' e::silver:Expr '}'
   layout {silver:WhiteSpace}
   { top.ast = antiquoteExtExpr(^e); }
+| '$Exprs' '{' e::silver:Expr '}'
+  layout {silver:WhiteSpace}
+  { top.ast = antiquoteExtExprs(^e); }
 
 concrete productions top::foil:Name
 | '$Name' '{' e::silver:Expr '}'

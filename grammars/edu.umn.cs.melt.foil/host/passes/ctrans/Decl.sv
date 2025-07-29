@@ -16,7 +16,7 @@ top::VarDecl ::= n::Name t::TypeExpr i::Expr
 aspect production fnDecl
 top::FnDecl ::= n::Name ps::Params ret::TypeExpr body::Stmt
 {
-  top.protoDecls := pp"${ret.baseTypePP} ${ret.declaratorPP}(${ppImplode(pp", ", ps.translations)});\n";
+  top.protoDecls := pp"${ret.baseTypePP} ${ret.declaratorPP}(${ppImplode(pp", ", ps.translations)});${line()}";
   top.translation = pp"""${ret.baseTypePP} ${ret.declaratorPP}(${ppImplode(pp", ", ps.translations)}) {
   ${groupnest(2, body.translation)}
   ${if ret.type == l1:unitType() && !body.hasReturn then pp"return 0;" else pp""}
@@ -40,14 +40,14 @@ top::Param ::= n::Name t::TypeExpr
 aspect production structDecl
 top::StructDecl ::= n::Name fs::Fields
 {
-  top.protoDecls := pp"typedef struct ${n} ${n};\n";
-  top.translation = pp"struct ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};\n";
+  top.protoDecls := pp"typedef struct ${n} ${n};${line()}";
+  top.translation = pp"struct ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};${line()}";
 }
 aspect production unionDecl
 top::UnionDecl ::= n::Name fs::Fields
 {
-  top.protoDecls := pp"typedef union ${n} ${n};\n";
-  top.translation = pp"union ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};\n";
+  top.protoDecls := pp"typedef union ${n} ${n};${line()}";
+  top.translation = pp"union ${n} {${groupnestlines(2, ppImplode(line(), fs.translations))}};${line()}";
 }
 
 aspect translations on Fields of

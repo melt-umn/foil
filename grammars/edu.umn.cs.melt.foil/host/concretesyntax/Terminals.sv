@@ -53,6 +53,7 @@ terminal End_t         'end'    lexer classes {Keyword, Reserved};
 terminal Struct_t      'struct' lexer classes {Keyword, Reserved};
 terminal Union_t       'union'  lexer classes {Keyword, Reserved};
 terminal Record_t      'record' lexer classes {Keyword, Reserved};
+terminal Cast_t        'cast'   lexer classes {Keyword, Reserved};
 terminal Str_t         'str'    lexer classes {Keyword, Reserved};
 terminal Print_t       'print'  lexer classes {Keyword, Reserved};
 terminal Println_t     'println'lexer classes {Keyword, Reserved};
@@ -62,6 +63,7 @@ terminal Float_t        'float'  lexer classes {Type, Reserved};
 terminal Bool_t         'bool'   lexer classes {Type, Reserved};
 terminal String_t       'string' lexer classes {Type, Reserved};
 terminal Unit_t         'unit'   lexer classes {Type, Reserved};
+terminal Any_t          'any'    lexer classes {Type, Reserved};
 
 terminal Identifier_t    /[a-zA-Z_][a-zA-Z0-9_]*/ submits to Reserved;
 

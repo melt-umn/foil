@@ -36,6 +36,22 @@ top::silver:Expr ::= ast::ext:Expr
 }
 
 -- Foil-to-Silver bridge productions
+production antiquoteExtGlobalDecl
+top::ext:GlobalDecl ::= e::silver:Expr
+{
+  top.pp = pp"$$GlobalDecl{${text(e.unparse)}}";
+  top.directToCore = antiquoteGlobalDecl(^e);
+  top.ext:toCore = error("Should not be demanded");
+  top.ext:defs := error("Should not be demanded");
+  top.errors := error("Should not be demanded");
+}
+production antiquoteGlobalDecl
+top::core:GlobalDecl ::= e::silver:Expr
+{
+  top.pp = pp"$$GlobalDecl{${text(e.unparse)}}";
+  forwards to error("Should not be demanded");
+}
+
 production antiquoteExtTypeExpr
 top::ext:TypeExpr ::= e::silver:Expr
 {
@@ -50,6 +66,25 @@ production antiquoteTypeExpr
 top::core:TypeExpr ::= e::silver:Expr
 {
   top.pp = pp"$$TypeExpr{${text(e.unparse)}}";
+  forwards to error("Should not be demanded");
+}
+
+production antiquoteExtParams
+top::ext:Param ::= e::silver:Expr
+{
+  top.pp = pp"$$Params{${text(e.unparse)}}";
+  top.directToCore = antiquoteParams(^e);
+  top.ext:toCore = error("Should not be demanded");
+  top.ext:liftedDecls = error("Should not be demanded");
+  top.com:name = error("Should not be demanded");
+  top.ext:type = error("Should not be demanded");
+  top.errors := error("Should not be demanded");
+  top.ext:defs := error("Should not be demanded");
+}
+production antiquoteParams
+top::core:Param ::= e::silver:Expr
+{
+  top.pp = pp"$$Params{${text(e.unparse)}}";
   forwards to error("Should not be demanded");
 }
 
@@ -84,6 +119,23 @@ production antiquoteExpr
 top::core:Expr ::= e::silver:Expr
 {
   top.pp = pp"$$Expr{${text(e.unparse)}}";
+  forwards to error("Should not be demanded");
+}
+
+production antiquoteExtExprs
+top::ext:Expr ::= e::silver:Expr
+{
+  top.pp = pp"$$Exprs{${text(e.unparse)}}";
+  top.directToCore = antiquoteExprs(^e);
+  top.ext:toCore = error("Should not be demanded");
+  top.ext:liftedDecls = error("Should not be demanded");
+  top.errors := error("Should not be demanded");
+  top.ext:type = error("Should not be demanded");
+}
+production antiquoteExprs
+top::core:Expr ::= e::silver:Expr
+{
+  top.pp = pp"$$Exprs{${text(e.unparse)}}";
   forwards to error("Should not be demanded");
 }
 

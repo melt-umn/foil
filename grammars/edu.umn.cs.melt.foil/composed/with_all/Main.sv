@@ -7,6 +7,7 @@ imports edu:umn:cs:melt:foil:host:driver;
 parser foilParser :: cnc:Root {
   edu:umn:cs:melt:foil:host;
   edu:umn:cs:melt:foil:extensions:complex;
+  edu:umn:cs:melt:foil:extensions:closure;
 }
 
 fun main IO<Integer> ::= args::[String] = driver(args, foilParser);

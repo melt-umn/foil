@@ -47,6 +47,12 @@ static inline struct _string _str_bool(_Bool b) {
     return (struct _string){6, "false"};
   }
 }
+static inline struct _string _str_ptr(void *p) {
+  struct _string result;
+  result.data = GC_malloc(snprintf(NULL, 0, "%p", p) + 1);
+  result.length = sprintf(result.data, "%p", p);
+  return result;
+}
 """;
 }
 

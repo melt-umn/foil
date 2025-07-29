@@ -10,6 +10,8 @@ concrete productions top::Expr
   { abstract ext:let_; }
 | f::Expr '(' a::Exprs ')'
   { abstract ext:call; }
+| 'cast' '(' e::Expr ':' t::TypeExpr ')'
+  { abstract ext:cast; }
 | '*' e::Expr
   { abstract ext:deref; }
 | e1::Expr '[' e2::Expr ']'
@@ -80,7 +82,7 @@ concrete productions top::Expr
 | 'str' '(' e::Expr ')'
   { abstract ext:strOp; }
 
-tracked nonterminal Exprs with ast<ext:Exprs>;
+closed tracked nonterminal Exprs with ast<ext:Exprs>;
 concrete productions top::Exprs
 | e::Expr ',' es::Exprs
   { abstract ext:consExpr; }

@@ -27,3 +27,9 @@ top::GlobalDecl ::= d1::GlobalDecl d2::GlobalDecl
     else if d2.isEmptyGlobalDecl then @d1.toL2
     else l2:appendGlobalDecl(@d1.toL2, @d2.toL2, env=top.env);
 }
+
+aspect production errorTypeExpr
+top::TypeExpr ::=
+{
+  top.toL2 = error("Uncaught errorTypeExpr in toL2 pass");
+}

@@ -20,6 +20,9 @@ silver -o silver_compiler.jar "$@" edu:umn:cs:melt:foil:composed:silver_compiler
 silver-custom silver_compiler.jar -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
 export GRAMMAR_PATH="foil-complex.jar:$GRAMMAR_PATH"
 
+silver-custom silver_compiler.jar -o foil-closure.jar "$@" edu:umn:cs:melt:foil:extensions:closure
+export GRAMMAR_PATH="foil-closure.jar:$GRAMMAR_PATH"
+
 # Build compiler
 #silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:host
 silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_all

@@ -7,9 +7,12 @@ marking terminal FoilStmt_t 'Foil_Stmt'  lexer classes {silver:KEYWORD, silver:R
 marking terminal FoilExpr_t 'Foil_Expr'  lexer classes {silver:KEYWORD, silver:RESERVED};
 
 -- Terminal definitions for antiquote productions
+terminal EscapeGlobalDecl_t '$GlobalDecl'  lexer classes {foil:Keyword};
 terminal EscapeTypeExpr_t '$TypeExpr'  lexer classes {foil:Keyword};
+terminal EscapeParams_t '$Params'  lexer classes {foil:Keyword};
 terminal EscapeStmt_t '$Stmt'  lexer classes {foil:Keyword};
 terminal EscapeExpr_t '$Expr'  lexer classes {foil:Keyword};
+terminal EscapeExprs_t '$Exprs'  lexer classes {foil:Keyword};
 terminal EscapeName_t '$Name'  lexer classes {foil:Keyword};
 
 terminal LBracket_t '{';

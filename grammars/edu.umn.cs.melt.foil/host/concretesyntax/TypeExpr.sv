@@ -14,6 +14,8 @@ concrete productions top::TypeExpr
   { abstract ext:stringTypeExpr; }
 | 'unit'
   { abstract ext:unitTypeExpr; }
+| 'any' '*'
+  { abstract ext:anyPointerTypeExpr; }
 | t::TypeExpr '*'
   { abstract ext:pointerTypeExpr; }
 | t::TypeExpr '[' ']'

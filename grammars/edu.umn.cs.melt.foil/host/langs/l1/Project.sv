@@ -8,4 +8,7 @@ imports edu:umn:cs:melt:foil:host:common;
 include edu:umn:cs:melt:foil:host:langs:core {
   -- Records are lifted and replaced by global structs
   exclude productions recordLit, recordTypeExpr, recordType;
+
+  -- Construction utilities are excluded
+  exclude productions appendExprs, appendParams;
 }

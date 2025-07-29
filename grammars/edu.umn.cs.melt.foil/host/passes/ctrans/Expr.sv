@@ -3,15 +3,16 @@ grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 attribute translation occurs on Expr;
 aspect translation on Expr of
 | var(n) -> n.pp
-| let_(d, e) -> pp"({${box(pp"${d.varDeclTrans}\n${e.translation};")}})"
-| call(f, args) -> pp"${f.pp}(${group(box(ppImplode(pp",\n", args.translations)))})"
+| let_(d, e) -> pp"({${box(pp"${d.varDeclTrans}${line()}${e.translation};")}})"
+| call(f, args) -> pp"${f.pp}(${group(box(ppImplode(pp",${line()}", args.translations)))})"
+| cast(e, t) -> pp"((${t.translation})${e.translation})"
 | deref(e) -> pp"(*${e.translation})"
 | arraySubscript(e, idx) -> pp"${e.translation}[${idx.translation}]"
 | newPointer(e) ->
-  pp"({${group(box(pp"${elemTy.baseTypePP} ${elemTy.declaratorPP} = GC_malloc(sizeof(${elemTy.baseTypePP} ${elemTy.typeModifierPP}));\n*_ptr = ${e.translation};\n_ptr;"))}})"
+  pp"({${group(box(pp"${elemTy.baseTypePP} *${elemTy.declaratorPP} = GC_malloc(sizeof(${elemTy.baseTypePP} ${elemTy.typeModifierPP}));${line()}*_ptr = ${e.translation};\n_ptr;"))}})"
 | newArray(s, i) -> error("TODO: arrays")
 | arrayLit(_) -> error("TODO: array literals")
-| structLit(n, fs) -> pp"(${n}){${groupnestlines(2, ppImplode(pp",\n", fs.translations))}}"
+| structLit(n, fs) -> pp"(${n}){${groupnestlines(2, ppImplode(pp",${line()}", fs.translations))}}"
 | fieldAccess(e, f) -> pp"${e.translation}.${f}"
 | intLit(i) -> pp(i)
 | floatLit(f) -> pp(f)
@@ -19,7 +20,7 @@ aspect translation on Expr of
 | falseLit() -> pp"0"
 | stringLit(s) -> pp"(struct _string){${text(toString(length(s)))}, ${s}}"
 | unitLit() -> pp"0"
-| cond(c, t, e) -> parens(box(group(pp"${c.translation} ?\n${t.translation} :\n${e.translation}")))
+| cond(c, t, e) -> parens(box(group(pp"${c.translation} ?${line()}${t.translation} :${line()}${e.translation}")))
 | negOp(e) -> pp"(-${e.translation})"
 | addOp(lhs, rhs) -> binOpTrans("+", lhs, rhs)
 | subOp(lhs, rhs) -> binOpTrans("-", lhs, rhs)
@@ -36,7 +37,7 @@ aspect translation on Expr of
 | orOp(lhs, rhs) -> binOpTrans("||", lhs, rhs)
 | notOp(e) -> pp"(!${e.translation})"
 | concatOp(lhs, rhs) ->
-  pp"_concat_string(${group(box(pp"${lhs.translation},\n${rhs.translation}"))})"
+  pp"_concat_string(${group(box(pp"${lhs.translation},${line()}${rhs.translation}"))})"
 | strOp(e) ->
   case e.type of
   | l1:intType() -> pp"_str_int(${e.translation})"
@@ -44,20 +45,19 @@ aspect translation on Expr of
   | l1:boolType() -> pp"_str_bool(${e.translation})"
   | l1:stringType() -> e.translation
   | l1:unitType() -> pp"(struct _string){2, \"()\"}"
+  | l1:pointerType(_) -> pp"_str_ptr(${e.translation})"
   | _ -> error(s"str is not defined for type ${show(80, e.type)}")
   end
 | print_(e) -> pp"printf(\"%s\", ${e.translation}.data)"
 end;
 
 fun binOpTrans Document ::= op::String lhs::Decorated Expr rhs::Decorated Expr =
-  -- TODO: This crashes the pp library:
-  -- parens(group(box(pp"${lhs.translation} ${text(op)}\n${rhs.translation}")));
-  pp"(${lhs.translation} ${text(op)} ${rhs.translation})";
+  parens(group(box(pp"${lhs.translation} ${text(op)}${line()}${rhs.translation}")));
 
 aspect production newPointer
 top::Expr ::= i::Expr
 {
-  production elemTy1::l1:TypeExpr = i.type.l1:elemType.l1:typeExpr;
+  production elemTy1::l1:TypeExpr = i.type.l1:typeExpr;
   elemTy1.l1:env = top.env;
   production elemTy::TypeExpr = @elemTy1.toL2;
   elemTy.declName = name("_ptr");

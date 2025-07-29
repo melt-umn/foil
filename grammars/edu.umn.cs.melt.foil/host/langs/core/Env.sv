@@ -62,7 +62,7 @@ top::Env ::= e::Env
   top.typeScopes = openScope(e.typeScopes);
 }
 
-data nonterminal ValueItem with name, type, found, lookupErrors, isLValue;
+tracked data nonterminal ValueItem with name, type, found, lookupErrors, isLValue;
 aspect default production
 top::ValueItem ::=
 {
@@ -100,7 +100,7 @@ top::ValueItem ::= name::String
   top.isLValue = true;
 }
 
-data nonterminal TypeItem with name, type, found, lookupErrors;
+tracked data nonterminal TypeItem with name, type, found, lookupErrors;
 aspect default production
 top::TypeItem ::=
 {
