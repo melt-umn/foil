@@ -1,5 +1,11 @@
 grammar edu:umn:cs:melt:foil:host:langs:ext;
 
+aspect production call
+top::Expr ::= f::Expr a::Exprs
+{
+  top.toCore = f.type.callImpl(@f.toCore, @a.toCore);
+}
+
 dispatch CallImpl = core:Expr ::= f::core:Expr a::core:Exprs;
 synthesized attribute callImpl::CallImpl occurs on Type;
 aspect default production
@@ -20,12 +26,11 @@ top::core:Expr ::= f::core:Expr a::core:Exprs fnImpl::(core:Expr ::= Name) extra
     core:call(fnImpl(tmp), core:appendExprs(extraArgs(tmp), @a)));
 }
 
-aspect production call
-top::Expr ::= f::Expr a::Exprs
+aspect production strOp
+top::Expr ::= e::Expr
 {
-  top.toCore = f.type.callImpl(@f.toCore, @a.toCore);
+  top.toCore = e.type.strImpl(@e.toCore);
 }
-
 
 dispatch StrImpl = core:Expr ::= e::core:Expr;
 synthesized attribute strImpl::StrImpl occurs on Type;
@@ -43,10 +48,4 @@ top::core:Expr ::= e::core:Expr impl::(core:Expr ::= Name)
 {
   nondecorated local tmp::Name = freshName();
   forwards to core:let_(core:autoVarDecl(tmp, @e), impl(tmp));
-}
-
-aspect production strOp
-top::Expr ::= e::Expr
-{
-  top.toCore = e.type.strImpl(@e.toCore);
 }

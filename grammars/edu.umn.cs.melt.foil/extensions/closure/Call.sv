@@ -6,4 +6,13 @@ top::core:Expr ::= f::core:Expr a::core:Exprs
   forwards to bindCallImpl(@f, @a,
     \ fn::Name -> Foil_Expr { $Name{fn}.fn },
     \ fn::Name -> core:consExpr(Foil_Expr { $Name{fn}.env }, core:nilExpr()));
+
+{-
+  nondecorated local fName::Name = freshName();
+  forwards to Foil_Expr {
+    let var $Name{fName} = $Expr{@f}
+    in $Name{fName}.fn($Name{fName}.env, $Exprs{@a})
+    end
+  };
+  -}
 }
