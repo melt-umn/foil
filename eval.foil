@@ -1,0 +1,9 @@
+
+data Expr {
+  Const(x : int);
+  Add(a : Expr, b : Expr);
+  Sub(a : Expr, b : Expr);
+  Mul(a : Expr, b : Expr);
+  Div(a : Expr, b : Expr);
+}
+

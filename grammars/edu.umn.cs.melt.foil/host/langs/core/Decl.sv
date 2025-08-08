@@ -90,40 +90,53 @@ top::Param ::= n::Name t::TypeExpr
   top.defs := valueDefs([paramValueItem(top)]);
 }
 
-tracked nonterminal StructDecl with pp, env, name, fields, defs, errors;
+synthesized attribute declId::Integer;
+
+tracked nonterminal StructDecl with pp, env, declId, name, fields, defs, errors;
 propagate env, errors on StructDecl;
 
 production structDecl
 top::StructDecl ::= n::Name fs::Fields
 {
   top.pp = pp"struct ${n} {${groupnestlines(2, ppImplode(pp",\n", fs.pps))}}";
+  top.declId = genInt();
   top.name = n.name;
   top.fields = fs.fields;
   top.defs := typeDefs([structTypeItem(top)]);
   top.errors <-
     if null(fs.errors) then []
     else fs.errors;
+
+  fs.declType = structType(top);
+  top.errors <- fs.infiniteTypeErrors;
 }
 
-tracked nonterminal UnionDecl with pp, env, name, fields, defs, errors;
+tracked nonterminal UnionDecl with pp, env, declId, name, fields, defs, errors;
 propagate env, errors on UnionDecl;
 
 production unionDecl
 top::UnionDecl ::= n::Name fs::Fields
 {
   top.pp = pp"union ${n} {${groupnestlines(2, ppImplode(pp",\n", fs.pps))}}";
+  top.declId = genInt();
   top.name = n.name;
   top.fields = fs.fields;
   top.defs := typeDefs([unionTypeItem(top)]);
   top.errors <-
     if null(fs.errors) then []
     else fs.errors;
+
+  fs.declType = unionType(top);
+  top.errors <- fs.infiniteTypeErrors;
 }
 
 synthesized attribute fields::[(String, Type)];
 
-tracked nonterminal Fields with pps, env, fields, errors;
-propagate env, errors on Fields;
+inherited attribute declType::Type;
+monoid attribute infiniteTypeErrors::[Message];
+
+tracked nonterminal Fields with pps, env, fields, errors, declType, infiniteTypeErrors;
+propagate env, errors, declType, infiniteTypeErrors on Fields;
 
 production nilField
 top::Fields ::=
@@ -142,7 +155,7 @@ top::Fields ::= f::Field fs::Fields
     else [];
 }
 
-tracked nonterminal Field with pp, env, name, type, errors;
+tracked nonterminal Field with pp, env, name, type, errors, declType, infiniteTypeErrors;
 propagate env, errors on Field;
 
 production field
@@ -151,4 +164,9 @@ top::Field ::= n::Name ty::TypeExpr
   top.pp = pp"${n} : ${ty}";
   top.name = n.name;
   top.type = ty.type;
+
+  top.infiniteTypeErrors :=
+    if contains(top.declType, nestedComponents([], top.type))
+    then [errFromOrigin(ty, s"Field of type ${show(80, ty.type)} contains the type being declared")]
+    else [];
 }

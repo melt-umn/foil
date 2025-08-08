@@ -15,3 +15,7 @@ copper_mda testComplex(withHost) {
 copper_mda testClosure(withHost) {
   edu:umn:cs:melt:foil:extensions:closure;
 }
+
+copper_mda testDatatype(withHost) {
+  edu:umn:cs:melt:foil:extensions:datatype;
+}

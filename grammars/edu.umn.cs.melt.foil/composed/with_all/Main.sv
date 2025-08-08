@@ -8,6 +8,7 @@ parser foilParser :: cnc:Root {
   edu:umn:cs:melt:foil:host;
   edu:umn:cs:melt:foil:extensions:complex;
   edu:umn:cs:melt:foil:extensions:closure;
+  edu:umn:cs:melt:foil:extensions:datatype;
 }
 
 fun main IO<Integer> ::= args::[String] = driver(args, foilParser);

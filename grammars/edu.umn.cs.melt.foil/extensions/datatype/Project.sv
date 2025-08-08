@@ -1,4 +1,4 @@
-grammar edu:umn:cs:melt:foil:extensions:closure;
+grammar edu:umn:cs:melt:foil:extensions:datatype;
 
 imports edu:umn:cs:melt:foil:host:concretesyntax as cnc;
 imports edu:umn:cs:melt:foil:host:common;

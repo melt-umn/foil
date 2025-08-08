@@ -7,7 +7,7 @@ imports edu:umn:cs:melt:foil:host:common;
 imports edu:umn:cs:melt:foil:host:langs:core as core;
 
 include edu:umn:cs:melt:foil:host:langs:core {
-  close nonterminals GlobalDecl, Stmt, Expr, TypeExpr, Type, Param;
+  close nonterminals GlobalDecl, Stmt, Expr, TypeExpr, Type, ValueItem, TypeItem;
 }
 
 translation pass toCore

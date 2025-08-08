@@ -9,10 +9,11 @@ synthesized attribute isStrable::Boolean;
 synthesized attribute isCastableTo::(Boolean ::= Type);
 synthesized attribute structFields::Maybe<[(String, Type)]>;
 synthesized attribute elemType::Type;
+synthesized attribute components::[Type];
 
 tracked data nonterminal Type with
   pp, mangledName, typeExpr, isEqualTo, isNumeric, isCallable, paramTypes, retType, 
-  isStrable, isCastableTo, structFields, elemType;
+  isStrable, isCastableTo, structFields, elemType, components;
 aspect default production
 top::Type ::=
 {
@@ -24,6 +25,7 @@ top::Type ::=
   top.isCastableTo = \ other::Type -> other == top || other == errorType();
   top.structFields = nothing();
   top.elemType = errorType();
+  top.components = [];
 }
 production intType
 top::Type ::=
@@ -161,11 +163,12 @@ top::Type ::= d::Decorated StructDecl
   top.typeExpr = nameTypeExpr(name(d.name));
   top.isEqualTo = \ other::Type ->
     case other of
-    | structType(d2) -> d.name == d2.name
+    | structType(d2) -> d.declId == d2.declId
     | errorType() -> true
     | _ -> false
     end;
   top.structFields = just(d.fields);
+  top.components = map(snd, d.fields);
 }
 production unionType
 top::Type ::= d::Decorated UnionDecl
@@ -175,11 +178,12 @@ top::Type ::= d::Decorated UnionDecl
   top.typeExpr = nameTypeExpr(name(d.name));
   top.isEqualTo = \ other::Type ->
     case other of
-    | unionType(d2) -> d.name == d2.name
+    | unionType(d2) -> d.declId == d2.declId
     | errorType() -> true
     | _ -> false
     end;
   top.structFields = just(d.fields);
+  top.components = map(snd, d.fields);
 }
 -- Invariant: fields are in sorted order by name
 production recordType
@@ -196,6 +200,7 @@ top::Type ::= fs::[(String, Type)]
     | _ -> false
     end;
   top.structFields = just(fs);
+  top.components = map(snd, fs);
 }
 production fnType
 top::Type ::= params::[Type] ret::Type
@@ -229,3 +234,7 @@ top::Type ::=
 instance Eq Type {
   eq = uncurry((.isEqualTo), _, _);
 }
+
+fun nestedComponents [Type] ::= seen::[Type] t::Type = t ::
+  if contains(t, seen) then []
+  else flatMap(nestedComponents(t :: seen, _), t.components);
