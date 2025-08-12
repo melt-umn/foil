@@ -1,6 +1,6 @@
 grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 
-attribute translation occurs on Root, GlobalDecl;
+attribute translation occurs on Root;
 
 aspect production root
 top::Root ::= d::GlobalDecl
@@ -8,7 +8,13 @@ top::Root ::= d::GlobalDecl
   production attribute preDecls::Document with cat;
   preDecls := pp"";
 
-  top.translation = pp"${preDecls}\n${d.protoDecls}\n${d.translation}";
+  top.translation = pp"""
+${preDecls}
+${d.protoDecls}
+${ppConcat(map(snd, sortByKey(fst, d.typeDclTrans)))}
+${d.varDeclTrans}
+${d.fnDeclTrans}
+""";
 
   preDecls <- pp"""
 #include <stdio.h>
@@ -56,15 +62,21 @@ static inline struct _string _str_ptr(void *p) {
 """;
 }
 
+monoid attribute protoDecls::Document occurs on GlobalDecl;
+monoid attribute typeDclTrans::[(Integer, Document)] occurs on GlobalDecl;
+monoid attribute varDeclTrans::Document occurs on GlobalDecl;
+monoid attribute fnDeclTrans::Document occurs on GlobalDecl;
+propagate protoDecls, typeDclTrans, varDeclTrans, fnDeclTrans on GlobalDecl;
 
-aspect translation on GlobalDecl of
-| appendGlobalDecl(d1, d2) -> cat(d1.translation, d2.translation)
-| emptyGlobalDecl() -> pp""
-| varGlobalDecl(d) -> pp""
-| fnGlobalDecl(d) -> d.translation
-| structGlobalDecl(d) -> d.translation
-| unionGlobalDecl(d) -> d.translation
+aspect typeDclTrans on GlobalDecl using <- of
+| structGlobalDecl(d) -> [(d.nestLevel, d.translation)]
+| unionGlobalDecl(d) -> [(d.nestLevel, d.translation)]
 end;
 
-monoid attribute protoDecls::Document occurs on GlobalDecl;
-propagate protoDecls on GlobalDecl;
+aspect varDeclTrans on GlobalDecl using <- of
+| varGlobalDecl(d) -> cat(d.translation, line())
+end;
+
+aspect fnDeclTrans on GlobalDecl using <- of
+| fnGlobalDecl(d) -> d.translation
+end;

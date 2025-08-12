@@ -21,13 +21,20 @@ top::TypeItem ::=
 {
   top.constructors = [];
 }
-
 production dataTypeItem
 top::TypeItem ::= d::Decorated DataDecl
 {
   top.name = d.name;
   top.type = dataType(d);
   top.constructors = d.constructors;
+}
+
+production constructorValueItem
+top::ValueItem ::= c::Decorated Constructor
+{
+  top.name = c.name;
+  top.type = fnType(c.paramTypes, dataType(c.dataDecl));
+  top.isLValue = false;
 }
 
 production dataGlobalDecl
@@ -37,6 +44,8 @@ top::GlobalDecl ::= d::DataDecl
   propagate env, errors;
   top.defs := d.defs;
   top.toCore = @d.liftedDecls;
+
+  top.defs <- valueDefs(map(constructorValueItem, d.constructors));
 }
 
 synthesized attribute unionName::Name;
@@ -95,7 +104,7 @@ top::Constructors ::=
 
 translation attribute ctorField::core:Field;
 
-tracked nonterminal Constructor with pp, env, dataDecl, index, name, paramTypes, errors, liftedDecls, ctorField;
+tracked nonterminal Constructor with pp, env, dataDecl, index, name, paramNames, paramTypes, errors, liftedDecls, ctorField;
 propagate env, dataDecl, errors on Constructor;
 
 production constructor
@@ -103,6 +112,7 @@ top::Constructor ::= n::Name params::Params
 {
   top.pp = pp"${n}(${ppImplode(pp", ", params.pps)});";
   top.name = n.name;
+  top.paramNames = params.paramNames;
   top.paramTypes = params.paramTypes;
   top.errors <- params.paramInfiniteTypeErrors;
   

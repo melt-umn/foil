@@ -27,10 +27,11 @@ top::VarDecl ::= n::Name i::Expr
   top.defs := valueDefs([varValueItem(top)]);
 }
 
+synthesized attribute paramNames::[String];
 synthesized attribute paramTypes::[Type];
 synthesized attribute retType::Type;
 
-tracked nonterminal FnDecl with pp, env, defs, name, paramTypes, retType, errors;
+tracked nonterminal FnDecl with pp, env, defs, name, paramNames, paramTypes, retType, errors;
 propagate errors on FnDecl;
 
 production fnDecl
@@ -38,6 +39,7 @@ top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
 {
   top.pp = pp"fun ${n}(${ppImplode(pp", ", params.pps)}) -> ${ret} {${groupnestlines(2, body.pp)}}";
   top.name = n.name;
+  top.paramNames = params.paramNames;
   top.paramTypes = params.paramTypes;
   top.retType = ret.type;
   top.defs := valueDefs([fnValueItem(top)]);
@@ -53,19 +55,21 @@ top::FnDecl ::= n::Name params::Params ret::TypeExpr body::Stmt
     else [errFromOrigin(body, s"Function ${n.name} must return a value of type ${show(80, ret.type)}")];
 }
 
-tracked nonterminal Params with pps, env, paramTypes, defs, errors;
+tracked nonterminal Params with pps, env, paramNames, paramTypes, defs, errors;
 propagate env, defs, errors on Params;
 
 production consParam
 top::Params ::= p::Param ps::Params
 {
   top.pps = p.pp :: ps.pps;
+  top.paramNames = p.name :: ps.paramNames;
   top.paramTypes = p.type :: ps.paramTypes;
 }
 production nilParam
 top::Params ::= 
 {
   top.pps = [];
+  top.paramNames = [];
   top.paramTypes = [];
 }
 production appendParams

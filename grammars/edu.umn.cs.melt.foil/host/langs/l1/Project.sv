@@ -12,3 +12,19 @@ include edu:umn:cs:melt:foil:host:langs:core {
   -- Construction utilities are excluded
   exclude productions appendExprs, appendParams;
 }
+
+synthesized attribute nestLevel::Integer occurs on Type, StructDecl, UnionDecl;
+
+aspect nestLevel on Type of
+| structType(t) -> t.nestLevel
+| unionType(t) -> t.nestLevel
+| _ -> 0
+end;
+
+aspect nestLevel on StructDecl of
+| structDecl(n, fs) -> 1 + foldr(max, 0, map((.nestLevel), map(snd, fs.fields)))
+end;
+
+aspect nestLevel on UnionDecl of
+| unionDecl(n, fs) -> 1 + foldr(max, 0, map((.nestLevel), map(snd, fs.fields)))
+end;

@@ -7,7 +7,7 @@ imports edu:umn:cs:melt:foil:host:common;
 imports edu:umn:cs:melt:foil:host:langs:l1;
 
 include edu:umn:cs:melt:foil:host:langs:l1 {
-  annotate attributes env, type, types, fields, expectedFields;
+  annotate attributes env, type, types, fields, expectedFields, nestLevel;
   exclude nonterminals Defs, Env, ValueItem, TypeItem, Type;
   exclude attributes defs, declaredEnv, isNumeric, typeExpr, isEqualTo, structFields, elemType, components, declType, infiniteTypeErrors;
   exclude productions mkAppendGlobalDecl, mkEmptyGlobalDecl, mkSeq, mkEmptyStmt, errorTypeExpr;

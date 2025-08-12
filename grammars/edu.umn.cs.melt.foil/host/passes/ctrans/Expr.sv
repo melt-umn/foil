@@ -3,7 +3,7 @@ grammar edu:umn:cs:melt:foil:host:passes:ctrans;
 attribute translation occurs on Expr;
 aspect translation on Expr of
 | var(n) -> n.pp
-| let_(d, e) -> pp"({${box(pp"${d.varDeclTrans}${line()}${e.translation};")}})"
+| let_(d, e) -> pp"({${box(pp"${d.translation}${line()}${e.translation};")}})"
 | call(f, args) -> pp"${f.pp}(${group(box(ppImplode(pp",${line()}", args.translations)))})"
 | cast(e, t) -> pp"((${t.translation})${e.translation})"
 | deref(e) -> pp"(*${e.translation})"

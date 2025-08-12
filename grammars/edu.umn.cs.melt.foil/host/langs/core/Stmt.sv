@@ -23,7 +23,7 @@ top::Stmt ::=
 production seq
 top::Stmt ::= s1::Stmt s2::Stmt
 {
-  top.pp = pp"${s1}\n${s2}";
+  top.pp = pp"${s1}${line()}${s2}";
   top.isEmpty = s1.isEmpty && s2.isEmpty;
   s1.env = top.env;
   s2.env = addEnv(s1.defs, s1.env);
