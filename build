@@ -31,4 +31,4 @@ export GRAMMAR_PATH="foil-datatype.jar:$GRAMMAR_PATH"
 silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_all
 
 # Perform MDA tests
-#silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests
+silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests

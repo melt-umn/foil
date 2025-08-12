@@ -42,6 +42,51 @@ top::Pattern ::= p1::Pattern p2::Pattern
   top.pp = pp"${p1.pp}@${p2.pp}";
   propagate scrutineeType, scrutineeTrans, patternTrans;
 }
+production intLitPattern
+top::Pattern ::= i::Integer
+{
+  top.pp = pp(i);
+  top.errors <-
+    if top.scrutineeType == intType() then []
+    else [errFromOrigin(top, s"Expected to match ${show(80, top.scrutineeType)}, but found an integer literal")];
+  top.patternTrans := condPatternTrans(core:eqOp(top.scrutineeTrans, core:intLit(i)));
+}
+production floatLitPattern
+top::Pattern ::= f::Float
+{
+  top.pp = pp(f);
+  top.errors <-
+    if top.scrutineeType == floatType() then []
+    else [errFromOrigin(top, s"Expected to match ${show(80, top.scrutineeType)}, but found a float literal")];
+  top.patternTrans := condPatternTrans(core:eqOp(top.scrutineeTrans, core:floatLit(f)));
+}
+production trueLitPattern
+top::Pattern ::=
+{
+  top.pp = pp"true";
+  top.errors <-
+    if top.scrutineeType == boolType() then []
+    else [errFromOrigin(top, s"Expected to match ${show(80, top.scrutineeType)}, but found a Boolean literal")];
+  top.patternTrans := condPatternTrans(top.scrutineeTrans);
+}
+production falseLitPattern
+top::Pattern ::=
+{
+  top.pp = pp"false";
+  top.errors <-
+    if top.scrutineeType == boolType() then []
+    else [errFromOrigin(top, s"Expected to match ${show(80, top.scrutineeType)}, but found a Boolean literal")];
+  top.patternTrans := condPatternTrans(core:notOp(top.scrutineeTrans));
+}
+production stringLitPattern
+top::Pattern ::= s::String
+{
+  top.pp = pp(s);
+  top.errors <-
+    if top.scrutineeType == stringType() then []
+    else [errFromOrigin(top, s"Expected to match ${show(80, top.scrutineeType)}, but found a string literal")];
+  top.patternTrans := condPatternTrans(core:eqOp(top.scrutineeTrans, core:stringLit(s)));
+}
 production pointerPattern
 top::Pattern ::= p::Pattern
 {

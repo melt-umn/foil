@@ -13,6 +13,7 @@ fun eval(e : Expr*) -> int {
     &Add(a, b) -> { return eval(a) + eval(b); }
     &Sub(a, b) -> { return eval(a) - eval(b); }
     &Mul(a, b) -> { return eval(a) * eval(b); }
+    &Div(_, &Const(0)) -> { println("Division by zero!"); return -1; }
     &Div(a, b) -> { return eval(a) / eval(b); }
   }
   return -1;
@@ -21,5 +22,7 @@ fun eval(e : Expr*) -> int {
 fun main() -> int {
   var e1 = new Add(new Sub(new Const(1), new Const(2)), new Mul(new Const(3), new Div(new Const(4), new Const(2))));
   println(eval(e1));
+  var e2 = new Add(new Sub(new Const(5), new Const(4)), new Mul(new Const(3), new Div(new Const(2), new Const(0))));
+  println(eval(e2));
   return 0;
 }

@@ -40,7 +40,7 @@ concrete productions top::MatchCases_c
 
 tracked nonterminal MatchCase_c with ast<MatchCase>;
 concrete productions top::MatchCase_c
-| p::Pattern_c '->' '{' s::cnc:Stmt '}'
+| p::Pattern_c '->' '{' s::cnc:StmtList '}'
   { abstract matchCase; }
 
 tracked nonterminal Pattern_c with ast<Pattern>;
@@ -51,6 +51,16 @@ concrete productions top::Pattern_c
   { top.ast = varPattern(name(id.lexeme)); }
 | p1::Pattern_c '@' p2::Pattern_c
   { abstract bothPattern; }
+| i::cnc:IntLit_t
+  { top.ast = intLitPattern(toInteger(i.lexeme)); }
+| f::cnc:FloatLit_t
+  { top.ast = floatLitPattern(toFloat(f.lexeme)); }
+| 'true'
+  { abstract trueLitPattern; }
+| 'false'
+  { abstract falseLitPattern; }
+| s::cnc:StringLit_t
+  { top.ast = stringLitPattern(unescapeString(s.lexeme)); }
 | '&' p::Pattern_c
   { abstract pointerPattern; }
 | n::cnc:Name '(' ps::Patterns_c ')'
