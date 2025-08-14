@@ -19,3 +19,7 @@ copper_mda testClosure(withHost) {
 copper_mda testDatatype(withHost) {
   edu:umn:cs:melt:foil:extensions:datatype;
 }
+
+copper_mda testIntConst(withHost) {
+  edu:umn:cs:melt:foil:extensions:intconst;
+}

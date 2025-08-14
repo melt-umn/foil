@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euox pipefail
 
 export GRAMMAR_PATH=grammars
 
@@ -9,26 +9,29 @@ export SILVER_GEN=generated
 # Need to bump up the heap space to run the MWDA:
 export SVJVM_FLAGS="-Xmx6G -Xss25m"
 
+SV_FLAGS="$@"
+
 # Build host
-silver -o foil.jar "$@" edu:umn:cs:melt:foil:host
+silver -o foil.jar $SV_FLAGS edu:umn:cs:melt:foil:host
 export GRAMMAR_PATH="foil.jar:$GRAMMAR_PATH"
 
 # Build extended Silver compiler
-silver -o silver_compiler.jar "$@" edu:umn:cs:melt:foil:composed:silver_compiler
+silver -o silver_compiler.jar $SV_FLAGS edu:umn:cs:melt:foil:composed:silver_compiler
 
 # Build extensions
-silver-custom silver_compiler.jar -o foil-complex.jar "$@" edu:umn:cs:melt:foil:extensions:complex
-export GRAMMAR_PATH="foil-complex.jar:$GRAMMAR_PATH"
+build_extension() {
+  silver-custom silver_compiler.jar -o foil-$1.jar $SV_FLAGS edu:umn:cs:melt:foil:extensions:$1
+  export GRAMMAR_PATH="foil-$1.jar:$GRAMMAR_PATH"
+}
 
-silver-custom silver_compiler.jar -o foil-closure.jar "$@" edu:umn:cs:melt:foil:extensions:closure
-export GRAMMAR_PATH="foil-closure.jar:$GRAMMAR_PATH"
-
-silver-custom silver_compiler.jar -o foil-datatype.jar "$@" edu:umn:cs:melt:foil:extensions:datatype
-export GRAMMAR_PATH="foil-datatype.jar:$GRAMMAR_PATH"
+build_extension complex
+build_extension closure
+build_extension datatype
+build_extension intconst
 
 # Build compiler
-#silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:host
-silver -o compiler.jar "$@" edu:umn:cs:melt:foil:composed:with_all
+#silver -o compiler.jar $SV_FLAGS edu:umn:cs:melt:foil:composed:host
+silver -o compiler.jar $SV_FLAGS edu:umn:cs:melt:foil:composed:with_all
 
 # Perform MDA tests
-silver --dont-translate "$@" edu:umn:cs:melt:foil:composed:mda_tests
+silver --dont-translate $SV_FLAGS edu:umn:cs:melt:foil:composed:mda_tests

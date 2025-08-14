@@ -1,0 +1,7 @@
+intconst x = 4 * 10 + 2;
+
+fun main() -> int {
+  intconst y = x / 2;
+  println(let intconst z = x + y in z end);
+  return 0;
+}
