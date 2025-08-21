@@ -15,7 +15,7 @@ translation pass toCore
     to edu:umn:cs:melt:foil:host:langs:core
   excluding
     varGlobalDecl, fnGlobalDecl, structGlobalDecl, unionGlobalDecl,
-    call, strOp;
+    call, negOp, addOp, subOp, mulOp, divOp, eqOp, neqOp, gtOp, ltOp, gteOp, lteOp, strOp;
 
 monoid translation attribute liftedDecls::core:GlobalDecl
   with core:emptyGlobalDecl(), core:appendGlobalDecl;

@@ -520,6 +520,26 @@ top::Expr ::= e::Expr
     if e.type.isStrable then []
     else [errFromOrigin(e, s"str expected a stringifyable type, but got ${show(80, e.type)}")];
 }
+production intOp
+top::Expr ::= e::Expr
+{
+  top.pp = pp"int(${e.wrapPP})";
+  top.wrapPP = top.pp;
+  top.type = intType();
+  top.errors <-
+    if e.type.isIntable then []
+    else [errFromOrigin(e, s"str expected a int-convertible type, but got ${show(80, e.type)}")];
+}
+production floatOp
+top::Expr ::= e::Expr
+{
+  top.pp = pp"float(${e.wrapPP})";
+  top.wrapPP = top.pp;
+  top.type = floatType();
+  top.errors <-
+    if e.type.isFloatable then []
+    else [errFromOrigin(e, s"str expected a float-convertible type, but got ${show(80, e.type)}")];
+}
 production print_
 top::Expr ::= e::Expr
 {

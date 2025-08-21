@@ -38,6 +38,8 @@ aspect translation on Expr of
 | notOp(e) -> pp"(!${e.translation})"
 | concatOp(lhs, rhs) ->
   pp"_concat_string(${group(box(pp"${lhs.translation},${line()}${rhs.translation}"))})"
+| intOp(e) -> pp"((int)${e.translation})"
+| floatOp(e) -> pp"((float)${e.translation})"
 | strOp(e) ->
   case e.type of
   | l1:intType() -> pp"_str_int(${e.translation})"

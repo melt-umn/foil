@@ -1,8 +1,8 @@
 grammar edu:umn:cs:melt:foil:extensions:complex;
 
 marking terminal Complex_t 'complex' lexer classes cnc:Keyword;
-marking terminal Real_t    'real'    precedence=10, lexer classes cnc:Keyword;
-marking terminal Imag_t    'imag'    precedence=10, lexer classes cnc:Keyword;
+marking terminal Real_t    'real'    precedence=15, lexer classes cnc:Keyword;
+marking terminal Imag_t    'imag'    precedence=15, lexer classes cnc:Keyword;
 
 disambiguate Complex_t, cnc:Identifier_t { pluck Complex_t; }
 disambiguate Real_t, cnc:Identifier_t { pluck Real_t; }

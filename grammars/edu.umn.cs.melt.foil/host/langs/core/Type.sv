@@ -5,6 +5,8 @@ synthesized attribute typeExpr::TypeExpr;
 synthesized attribute isEqualTo::(Boolean ::= Type);
 synthesized attribute isNumeric::Boolean;
 synthesized attribute isCallable::Boolean;
+synthesized attribute isIntable::Boolean;
+synthesized attribute isFloatable::Boolean;
 synthesized attribute isStrable::Boolean;
 synthesized attribute isCastableTo::(Boolean ::= Type);
 synthesized attribute structFields::Maybe<[(String, Type)]>;
@@ -13,7 +15,7 @@ synthesized attribute components::[Type];
 
 tracked data nonterminal Type with
   pp, mangledName, typeExpr, isEqualTo, isNumeric, isCallable, paramTypes, retType, 
-  isStrable, isCastableTo, structFields, elemType, components;
+  isIntable, isFloatable, isStrable, isCastableTo, structFields, elemType, components;
 aspect default production
 top::Type ::=
 {
@@ -21,6 +23,8 @@ top::Type ::=
   top.isCallable = false;
   top.paramTypes = [];
   top.retType = errorType();
+  top.isIntable = false;
+  top.isFloatable = false;
   top.isStrable = false;
   top.isCastableTo = \ other::Type -> other == top || other == errorType();
   top.structFields = nothing();
@@ -40,6 +44,8 @@ top::Type ::=
     | _ -> false
     end;
   top.isNumeric = true;
+  top.isIntable = true;
+  top.isFloatable = true;
   top.isStrable = true;
 }
 production floatType
@@ -55,6 +61,8 @@ top::Type ::=
     | _ -> false
     end;
   top.isNumeric = true;
+  top.isIntable = true;
+  top.isFloatable = true;
   top.isStrable = true;
 }
 production boolType

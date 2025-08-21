@@ -79,6 +79,10 @@ concrete productions top::Expr
 | e1::Expr '++' e2::Expr
   { abstract ext:concatOp; }
 
+| 'int' '(' e::Expr ')'
+  { abstract ext:intOp; }
+| 'float' '(' e::Expr ')'
+  { abstract ext:floatOp; }
 | 'str' '(' e::Expr ')'
   { abstract ext:strOp; }
 

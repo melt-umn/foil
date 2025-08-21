@@ -1,0 +1,33 @@
+fun mandelbrot(c : complex, n : int) -> bool {
+  var z = 0.0 +i 0.0;
+  var i = 0;
+  while (i < n) {
+    if (real z * real z + imag z * imag z > 4.0) return false;
+    z = z * z + c;
+    i = i + 1;
+  }
+  return true;
+}
+
+fun print_mandelbrot(w : int, h : int) {
+  var y = 0;
+  while (y < h) {
+    var x = 0;
+    while (x < w) {
+      // Map pixel (x,y) → complex plane coordinate (c)
+      var real_part = (2.47 * float(x)) / float(w - 1) - 2.0;
+      var imag_part = (2.24 * float(y)) / float(h - 1) - 1.12;
+      var c = real_part +i imag_part;
+
+      // Print '.' if in the set, ' ' otherwise
+      print(mandelbrot(c, 1000) ? "." : " ");
+      x = x + 1;
+    }
+    print("\n");
+    y = y + 1;
+  }
+}
+
+fun main() {
+  print_mandelbrot(160, 80);
+}

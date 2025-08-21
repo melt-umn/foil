@@ -14,6 +14,11 @@ top::Type ::=
   top.typeExpr = complexTypeExpr();
   top.isNumeric = true;  -- TODO: overloading translation?
   top.isStrable = true;
+  top.negOpImpl = complexNegOpImpl;
+  top.addOpImpl = complexAddOpImpl;
+  top.subOpImpl = complexSubOpImpl;
+  top.mulOpImpl = complexMulOpImpl;
+  top.divOpImpl = complexDivOpImpl;
   top.strImpl = complexStrImpl;
 }
 
@@ -95,6 +100,49 @@ top::Expr ::= e::Expr
   propagate liftedDecls;
 }
 
+production complexNegOpImpl implements UnaryOpImpl
+top::core:Expr ::= e::core:Expr
+{
+  forwards to bindNegOpImpl(@e, \ a::Name -> Foil_Expr {
+    record { real = -$Name{a}.real, imag = -$Name{a}.imag }
+  });
+}
+production complexAddOpImpl implements BinOpImpl
+top::core:Expr ::= l::core:Expr r::core:Expr
+{
+  forwards to bindBinOpImpl(@l, @r, \ a::Name b::Name -> Foil_Expr {
+    record { real = $Name{a}.real + $Name{b}.real, imag = $Name{a}.imag + $Name{b}.imag }
+  });
+}
+production complexSubOpImpl implements BinOpImpl
+top::core:Expr ::= l::core:Expr r::core:Expr
+{
+  forwards to bindBinOpImpl(@l, @r, \ a::Name b::Name -> Foil_Expr {
+    record { real = $Name{a}.real - $Name{b}.real, imag = $Name{a}.imag - $Name{b}.imag }
+  });
+}
+production complexMulOpImpl implements BinOpImpl
+top::core:Expr ::= l::core:Expr r::core:Expr
+{
+  forwards to bindBinOpImpl(@l, @r, \ a::Name b::Name -> Foil_Expr {
+    record {
+      real = $Name{a}.real * $Name{b}.real - $Name{a}.imag * $Name{b}.imag,
+      imag = $Name{a}.real * $Name{b}.imag + $Name{a}.imag * $Name{b}.real
+    }
+  });
+}
+production complexDivOpImpl implements BinOpImpl
+top::core:Expr ::= l::core:Expr r::core:Expr
+{
+  forwards to bindBinOpImpl(@l, @r, \ a::Name b::Name -> Foil_Expr {
+    let var denom = $Name{b}.real * $Name{b}.real + $Name{b}.imag * $Name{b}.imag
+    in record {
+      real = ($Name{a}.real * $Name{b}.real + $Name{a}.imag * $Name{b}.imag) / denom,
+      imag = ($Name{a}.imag * $Name{b}.real - $Name{a}.real * $Name{b}.imag) / denom
+    }
+    end
+  });
+}
 production complexStrImpl implements StrImpl
 top::core:Expr ::= e::core:Expr
 {
