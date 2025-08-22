@@ -23,3 +23,7 @@ copper_mda testDatatype(withHost) {
 copper_mda testIntConst(withHost) {
   edu:umn:cs:melt:foil:extensions:intconst;
 }
+
+copper_mda testForLoop(withHost) {
+  edu:umn:cs:melt:foil:extensions:forloop;
+}

@@ -28,6 +28,7 @@ build_extension complex
 build_extension closure
 build_extension datatype
 build_extension intconst
+build_extension forloop
 
 # Build compiler
 #silver -o compiler.jar $SV_FLAGS edu:umn:cs:melt:foil:composed:host
