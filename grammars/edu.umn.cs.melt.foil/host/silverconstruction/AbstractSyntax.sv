@@ -74,12 +74,7 @@ top::ext:Param ::= e::silver:Expr
 {
   top.pp = pp"$$Params{${text(e.unparse)}}";
   top.directToCore = antiquoteParams(^e);
-  top.ext:toCore = error("Should not be demanded");
-  top.ext:liftedDecls = error("Should not be demanded");
-  top.com:name = error("Should not be demanded");
-  top.ext:type = error("Should not be demanded");
-  top.errors := error("Should not be demanded");
-  top.ext:defs := error("Should not be demanded");
+  forwards to error("Should not be demanded");
 }
 production antiquoteParams
 top::core:Param ::= e::silver:Expr
