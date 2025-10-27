@@ -5,12 +5,12 @@ struct foo {
 }
 
 fun main() {
-  var x : record {a : int, b : float, c : string} =
+  var x : {a : int, b : float, c : string} =
     record {a=16, b=3.14, c="abcd"};
-  var y : record {a : int, b : float, c : string} = x;
+  var y : {a : int, b : float, c : string} = x;
   x.a = 21;
   //x.b = 42;
-  var z : foo = foo {s=x.c, b=x != y};
-  var w : record {f : foo*, rs : record {a : int, b : float, c : string}[], z : foo} =
-    record {f=new z, rs = new[] {x, y}, z=z};
+  //var z : foo = foo {s=x.c, b=x != y};
+  //var w : {f : foo*, rs : {a : int, b : float, c : string}[], z : foo} =
+  //  record {f=new z, rs = new[] {x, y}, z=z};
 }

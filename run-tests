@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euox pipefail
+
+for prog in *.foil; do
+    java -jar compiler.jar $prog
+
+    cfile="${prog%.foil}.c"
+    binfile="${prog%.foil}.out"
+    gcc -o "$binfile" "$cfile" -lm -lgc
+
+    ./"$binfile"
+done

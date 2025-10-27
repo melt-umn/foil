@@ -1,4 +1,4 @@
-fun colatz(n : int) -> int {
+fun collatz(n : int) -> int {
   var i : int = 0;
   while (n != 1) {
     if (n % 2 == 0) {
@@ -9,4 +9,11 @@ fun colatz(n : int) -> int {
     i = i + 1;
   }
   return i;
+}
+
+fun main() -> int {
+  for (i in 1 : 20) {
+    println(str(i) ++ ": " ++ str(collatz(i)));
+  }
+  return 0;
 }
