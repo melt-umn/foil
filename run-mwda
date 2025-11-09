@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euox pipefail
+
+export GRAMMAR_PATH=grammars
+
+# Need to bump up the heap space to run the MWDA:
+export SVJVM_FLAGS="-Xmx6G -Xss25m"
+
+SV_FLAGS="--clean --dont-translate --mwda --warn-sharing-cycles $@"
+
+silver-custom silver_compiler.jar $SV_FLAGS edu:umn:cs:melt:foil:composed:with_all
