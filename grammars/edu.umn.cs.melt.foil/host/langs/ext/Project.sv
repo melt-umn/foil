@@ -30,12 +30,6 @@ propagate liftedDecls on
   TypeExpr, TypeExprs,
   Stmt, Expr, Exprs, FieldExprs, FieldExpr;
 
-aspect production root
-top::Root ::= d::GlobalDecl
-{
-  d.toCore.core:env = core:addEnv(d.toCore.core:defs, core:emptyEnv());
-}
-
 aspect toCore on GlobalDecl of
 | varGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:varGlobalDecl(@d.toCore))
 | fnGlobalDecl(d) -> core:appendGlobalDecl(@d.liftedDecls, core:fnGlobalDecl(@d.toCore))

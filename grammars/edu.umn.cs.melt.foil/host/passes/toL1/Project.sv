@@ -37,12 +37,6 @@ propagate liftedDecls on
   Stmt, Expr, Exprs, FieldExprs, FieldExpr
   excluding recordLit, recordTypeExpr;
 
-aspect production root
-top::Root ::= d::GlobalDecl
-{
-  d.toL1.l1:env = l1:addEnv(d.toL1.l1:defs, l1:emptyEnv());
-}
-
 aspect toL1 on top::GlobalDecl of
 | appendGlobalDecl(d1, d2) -> l1:appendGlobalDecl(@d1.toL1, @d2.toL1)
 | varGlobalDecl(d) -> l1:appendGlobalDecl(@d.liftedDecls, l1:varGlobalDecl(@d.toL1))
