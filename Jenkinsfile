@@ -17,7 +17,7 @@ try {
 
   stage ("Build") {
     withEnv(newenv) {
-      sh "./build --clean --mwda"
+      sh "./build --clean --mwda --warn-sharing-cycles"
     }
   }
     
