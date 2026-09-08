@@ -22,6 +22,12 @@ aspect directToCore on ext:Expr of
 | _ -> error("Unexpected extension construct in core syntax literal")
 end;
 
+aspect production ext:root
+top::ext:Root ::= d::ext:GlobalDecl
+{
+  d.directToCore.core:env = core:addEnv(d.directToCore.core:defs, core:emptyEnv());
+}
+
 aspect production nonterminalAST
 top::AST ::= prodName::String children::ASTs annotations::NamedASTs
 {
