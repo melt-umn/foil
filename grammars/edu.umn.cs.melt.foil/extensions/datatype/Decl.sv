@@ -65,13 +65,23 @@ top::DataDecl ::= n::Name cs::Constructors
   cs.index = 0;
 
   top.unionName = name(s"_${n.name}_content");
-  top.liftedDecls = Foil_GlobalDecl {
+  local structDecl::core:GlobalDecl = Foil_GlobalDecl {
     struct $Name{@n} {
       tag : int, content : $Name{top.unionName}
     }
-    $GlobalDecl{core:unionGlobalDecl(core:unionDecl(top.unionName, @cs.ctorFields))}
+  };
+  local unionDecl::core:GlobalDecl =
+    core:unionGlobalDecl(core:unionDecl(top.unionName, @cs.ctorFields));
+  top.liftedDecls = Foil_GlobalDecl {
+    $GlobalDecl{@structDecl}
+    $GlobalDecl{@unionDecl}
     $GlobalDecl{@cs.liftedDecls}
   };
+  -- The same value that appendGlobalDecl supplies; stated here so that the sharing-cycle
+  -- check can see that it does not depend on the constructors' lifted declarations.
+  cs.liftedDecls.core:declaredEnv =
+    core:addEnv(unionDecl.core:defs,
+      core:addEnv(structDecl.core:defs, top.liftedDecls.core:declaredEnv));
 }
 
 inherited attribute dataDecl::Decorated DataDecl;
