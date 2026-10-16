@@ -73,9 +73,28 @@ production antiquoteExtParams
 top::ext:Param ::= e::silver:Expr
 {
   top.pp = pp"$$Params{${text(e.unparse)}}";
-  top.directToCore = antiquoteParams(^e);
-  forwards to error("Should not be demanded");
+  forwards to ext:param(error("Should not be demanded"), antiquoteExtParamsTypeExpr(^e));
 }
+production antiquoteExtParamsTypeExpr
+top::ext:TypeExpr ::= e::silver:Expr
+{
+  top.pp = pp"$$Params{${text(e.unparse)}}";
+  top.directToCore = error("Should not be demanded");
+  top.ext:toCore = error("Should not be demanded");
+  top.ext:liftedDecls = error("Should not be demanded");
+  top.errors := error("Should not be demanded");
+  top.ext:type = error("Should not be demanded");
+}
+aspect production ext:param
+top::ext:Param ::= n::com:Name t::ext:TypeExpr
+{
+  top.directToCore =
+    case t of
+    | antiquoteExtParamsTypeExpr(e) -> antiquoteParams(^e)
+    | _ -> core:param(^n, @t.directToCore)
+    end;
+}
+
 production antiquoteParams
 top::core:Param ::= e::silver:Expr
 {

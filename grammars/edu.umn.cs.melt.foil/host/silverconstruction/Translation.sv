@@ -4,7 +4,8 @@ grammar edu:umn:cs:melt:foil:host:silverconstruction;
 -- however we don't have a complete tree, and just want the equivalent core syntax:
 translation pass directToCore
   from edu:umn:cs:melt:foil:host:langs:ext
-    to edu:umn:cs:melt:foil:host:langs:core;
+    to edu:umn:cs:melt:foil:host:langs:core
+  excluding ext:param;
 
 aspect directToCore on ext:GlobalDecl of
 | _ -> error("Unexpected extension construct in core syntax literal")
@@ -44,10 +45,10 @@ top::AST ::= prodName::String children::ASTs annotations::NamedASTs
     ("edu:umn:cs:melt:foil:host:silverconstruction:antiquoteExprs", "Exprs",
      "edu:umn:cs:melt:foil:host:langs:core:consExpr",
      "edu:umn:cs:melt:foil:host:langs:core:nilExpr",
-     "edu:umn:cs:melt:foil:host:langs:core:appendExpr"),
+     "edu:umn:cs:melt:foil:host:langs:core:appendExprs"),
     ("edu:umn:cs:melt:foil:host:silverconstruction:antiquoteParams", "Params",
      "edu:umn:cs:melt:foil:host:langs:core:consParam",
      "edu:umn:cs:melt:foil:host:langs:core:nilParam",
-     "edu:umn:cs:melt:foil:host:langs:core:appendParam")
+     "edu:umn:cs:melt:foil:host:langs:core:appendParams")
   ];
 }
